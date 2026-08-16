@@ -36,7 +36,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public override string Name { get; } = "Dynamic Schematic Optimizer";
     public override string Description { get; } = "Plugin for ProjectMER that optimizes schematics ";
     public override string Author { get; } = "michcio";
-    public override Version Version { get; } = new(1, 0, 0);
+    public override Version Version { get; } = new(1, 1, 0);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
 
     public override void Enable()
@@ -64,6 +64,8 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
 
         _harmony.UnpatchAll(_harmony.Id);
         _harmony = null!;
+
+        _meroCompatibility = null!;
 
         ConfigLoader.Disable();
         SchematicSync.Unregister();
