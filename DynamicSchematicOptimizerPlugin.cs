@@ -1,4 +1,5 @@
-﻿using DynamicSchematicOptimizer.Events;
+﻿using DynamicSchematicOptimizer.Compatibility;
+using DynamicSchematicOptimizer.Events;
 using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Spawning;
 using DynamicSchematicOptimizer.Features.Toys;
@@ -7,6 +8,7 @@ using HarmonyLib;
 
 using JetBrains.Annotations;
 
+using LabApi.Events.Handlers;
 using LabApi.Features;
 using LabApi.Loader.Features.Plugins;
 
@@ -26,6 +28,8 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
 {
     private static Harmony _harmony = null!;
 
+    private MerOptimizerCompatibility _meroCompatibility = null!;
+
     public static new Config Config { get; private set; } = null!;
     public static DynamicSchematicOptimizerPlugin Instance { get; private set; } = null!;
 
@@ -43,11 +47,14 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         _harmony = new Harmony(nameof(DynamicSchematicOptimizerPlugin));
         _harmony.PatchAll();
 
+
         ConfigLoader.Init();
         SchematicSync.Register();
 
         SchematicEventHandler.SchematicSpawning += OnSchematicSpawning;
         Schematic.SchematicDestroyed += OnSchematicDestroyed;
+
+        ServerEvents.PluginsEnabled += OnPluginsEnabled;
     }
 
     public override void Disable()
@@ -56,19 +63,46 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         Config = null!;
 
         _harmony.UnpatchAll(_harmony.Id);
+        _harmony = null!;
 
         ConfigLoader.Disable();
         SchematicSync.Unregister();
 
         SchematicEventHandler.SchematicSpawning -= OnSchematicSpawning;
         Schematic.SchematicDestroyed -= OnSchematicDestroyed;
+        ServerEvents.PluginsEnabled -= OnPluginsEnabled;
     }
+
+    private void OnPluginsEnabled()
+    {
+        if (Config.UseMEROCompatibility)
+        {
+            try
+            {
+                _ = typeof(MEROptimizer.Application.MEROptimizer);
+                _meroCompatibility = new MerOptimizerCompatibility();
+            }
+            catch (Exception)
+            {
+                Log.Error("You don't have MEROptimizer installed");
+            }
+        }
+    }
+
 
     private void OnSchematicSpawning(SchematicSpawningExtendedEventArgs ev)
     {
         if (!ConfigLoader.TryGetConfig(ev.Schematic.SchematicName, out SchematicOptimisationConfig? optimisationConfig) || !optimisationConfig.Enabled)
         {
-            return;
+            if (_meroCompatibility == null || !_meroCompatibility.ShouldSchematicBeOptimized(ev.Schematic))
+            {
+                Log.Debug($"{ev.Schematic.SchematicName} is not optimized");
+                return;
+            }
+
+            Log.Debug($"{ev.Schematic.SchematicName} is optimized because of MERO compatibility");
+
+            optimisationConfig = Config.MeroSchematicDefaultConfig;
         }
 
         SchematicSpawnPlan plan =

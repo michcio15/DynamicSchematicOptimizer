@@ -43,6 +43,10 @@ public class ClientCullingInfoCommand : ICommand
         return true;
     }
 
+    public string Command { get; } = "cullinginfo";
+    public string[] Aliases { get; } = [];
+    public string Description { get; } = "Information about schematic culling";
+
     private static int GetToys(ClientSidedSchematic schematic)
     {
         int count = 0;
@@ -50,8 +54,4 @@ public class ClientCullingInfoCommand : ICommand
         count += schematic.SchematicObject.AdminToyBases.Count;
         return count;
     }
-
-    public string Command { get; } = "cullinginfo";
-    public string[] Aliases { get; } = [];
-    public string Description { get; } = "Information about schematic culling";
 }

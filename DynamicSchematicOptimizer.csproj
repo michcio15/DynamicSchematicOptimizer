@@ -28,6 +28,9 @@
         <Reference Include="Assembly-CSharp" Publicize="true">
             <HintPath>$(SL_REFERENCES)\Assembly-CSharp.dll</HintPath>
         </Reference>
+        <Reference Include="MEROptimizerLabAPI" Publicize="true">
+            <HintPath>$(LABAPI_PLUGINS)\MEROptimizerLabAPI.dll</HintPath>
+        </Reference>
         <Reference Include="ProjectMER" Publicize="true">
             <HintPath>$(LABAPI_PLUGINS)\ProjectMER.dll</HintPath>
         </Reference>

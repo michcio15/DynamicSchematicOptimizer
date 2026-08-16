@@ -1,8 +1,19 @@
+using System.ComponentModel;
+
 namespace DynamicSchematicOptimizer;
 
 public class Config
 {
     public bool Debug { get; set; } = false;
+
+    [Description("If true then schematics not optimized by MERO will be optimized by DSO")]
+    public bool UseMEROCompatibility { get; set; } = false;
+
+    [Description("Names of schematics that will not be optimized by DSO if they are not optimized by MERO")]
+    public List<string> ExcludedMEROSchematics { get; set; } = new();
+
+    public SchematicOptimisationConfig MeroSchematicDefaultConfig { get; set; } = new();
+
     public float CullingTickTimeInBetween { get; set; } = 1;
 
     public CommandPermissionsConfig Permissions { get; set; } = new();
