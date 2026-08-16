@@ -66,6 +66,7 @@ public static class ConfigLoader
     {
         string schematicDir = Path.Combine(PathManager.Configs.FullName, OptimizerSubdirectory);
 
+        Directory.CreateDirectory(schematicDir);
 
         IEnumerable<string> files = Directory.EnumerateFiles(schematicDir, "*.*", SearchOption.TopDirectoryOnly)
             .Where(static f => f.EndsWith(".yml", StringComparison.OrdinalIgnoreCase)
