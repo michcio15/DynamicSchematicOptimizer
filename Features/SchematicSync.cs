@@ -59,6 +59,14 @@ public static class SchematicSync
     internal static void Unregister()
     {
         ByNetID.Clear();
+
+        if (_coroutineHandle != null)
+        {
+            Timing.KillCoroutines(_coroutineHandle.Value);
+            _coroutineHandle = null;
+        }
+
+
         PlayerEvents.Left -= OnLeft;
     }
 

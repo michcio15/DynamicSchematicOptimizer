@@ -69,18 +69,17 @@ public abstract class ClientSideAdminToy
         writer.WriteByte((byte)((endPos - contentPos) & 0xFF));
         writer.Position = endPos;
 
-        SpawnMessage spawnMessage = new()
+        _spawnMessage = new SpawnMessage
         {
             assetId = AssetID,
             position = Position,
             rotation = Rotation,
             scale = Scale,
             netId = NetId,
-            payload = writer.ToArraySegment(),
+            payload = new ArraySegment<byte>(writer.ToArray()),
         };
         _spawnMessageSet = true;
-        _spawnMessage = spawnMessage;
-        return spawnMessage;
+        return _spawnMessage;
     }
 
     public void Spawn(NetworkConnection conn)

@@ -40,6 +40,7 @@ public class ClientCullingInfoCommand : ICommand
         }
 
         response = $"Visible schematics: {visibleSchematics} ({visibleToys}) / Hidden: {hiddenSchematics} ({hiddenToys})";
+        return true;
     }
 
     private static int GetToys(ClientSidedSchematic schematic)
