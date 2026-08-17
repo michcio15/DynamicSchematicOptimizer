@@ -79,7 +79,15 @@ public static class ConfigLoader
             try
             {
                 string yaml = File.ReadAllText(file);
-                SchematicOptimisationConfig optimisationConfig = Deserializer.Deserialize<SchematicOptimisationConfig>(yaml);
+                SchematicOptimisationConfig optimisationConfig =
+                    Deserializer.Deserialize<SchematicOptimisationConfig>(yaml) ?? new SchematicOptimisationConfig();
+
+                // updating the YAML for the updates
+                string updatedYaml = Serializer.Serialize(optimisationConfig);
+                if (updatedYaml != yaml)
+                {
+                    File.WriteAllText(file, updatedYaml);
+                }
 
                 ByName[name] = optimisationConfig;
             }

@@ -70,7 +70,7 @@ internal static class ClientSideSchematicBuilder
         return block.BlockType switch
         {
             BlockType.Primitive => SetupClientSidePrimitive(block, optimisationConfig.Primitive),
-            /*BlockType.Text => SetupClientSideText(block, optimisationConfig.TextToy),*/
+            BlockType.Text => SetupClientSideText(block, optimisationConfig.TextToy),
             BlockType.Light => SetupClientSideLight(block, optimisationConfig.LightSource),
             _ => throw new ArgumentOutOfRangeException($"Unsupported block type: {block.BlockType}"),
         };

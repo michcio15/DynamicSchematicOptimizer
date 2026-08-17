@@ -115,10 +115,10 @@ internal static class ClientSideSchematicPlanner
             return true;
         }
 
-        /*if (optimisationConfig.TextToy.Enabled && blockData.BlockType == BlockType.Text)
+        if (optimisationConfig.TextToy.Enabled && blockData.BlockType == BlockType.Text)
         {
             return true;
-        }*/
+        }
 
         if (optimisationConfig.LightSource.Enabled && blockData.BlockType == BlockType.Light)
         {

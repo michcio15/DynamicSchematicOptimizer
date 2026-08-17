@@ -2,6 +2,8 @@ using DynamicSchematicOptimizer.Features.Toys;
 
 using JetBrains.Annotations;
 
+using Mirror;
+
 using ProjectMER.Features.Objects;
 
 using Player = LabApi.Features.Wrappers.Player;
@@ -54,6 +56,34 @@ public class ClientSidedSchematic
 
         Spawned.Remove(player);
         Log.Debug($"Destroying {SchematicObject.name} for {player.Nickname}");
+    }
+
+    /// <summary>
+    /// Destroys entire schematic for the player, including server-sided toys.
+    /// </summary>
+    /// <param name="player">The player that will schematic be destoryed for</param>
+    /// <param name="addToIgnored">If <see langword="true"/> then player will be added to <see cref="Ignored"/> so culling won't spawn it.</param>
+    public void DestroyWithSchematic(Player player, bool addToIgnored = true)
+    {
+        Destroy(player);
+
+        foreach (NetworkIdentity identity in SchematicObject.NetworkIdentities)
+        {
+            player.Connection.Send(new ObjectDestroyMessage
+            {
+                netId = identity.netId,
+            });
+        }
+
+        player.Connection.Send(new ObjectDestroyMessage
+        {
+            netId = NetID,
+        });
+
+        if (addToIgnored)
+        {
+            Ignored.Add(player);
+        }
     }
 
     public void Destroy()

@@ -12,14 +12,13 @@ public class SchematicOptimisationConfig
         IsStatic = false,
     };
 
-    /*
-    public AdminToyOptimisationConfig TextToy { get; set; } = new()
-    {
-        Enabled = false,
-        IsStatic = false,
-    };*/
-
     public AdminToyOptimisationConfig LightSource { get; set; } = new()
+    {
+        Enabled = true,
+        IsStatic = false,
+    };
+
+    public AdminToyOptimisationConfig TextToy { get; set; } = new()
     {
         Enabled = true,
         IsStatic = false,
