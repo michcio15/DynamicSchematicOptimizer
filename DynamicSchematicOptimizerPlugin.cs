@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 
 using LabApi.Events.Handlers;
 using LabApi.Features;
+using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
 
 using Mirror;
@@ -79,15 +80,18 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     {
         if (Config.UseMEROCompatibility)
         {
-            try
+            if (!PluginLoader.EnabledPlugins.Any(static p => p.Name == "MEROptimizer"))
             {
-                _ = typeof(MEROptimizer.Application.MEROptimizer);
-                MEROCompatibility = new MerOptimizerCompatibility();
+                Log.Error("MEROptimizer is not enabled");
+                return;
             }
-            catch (Exception)
-            {
-                Log.Error("You don't have MEROptimizer installed");
-            }
+
+            MEROCompatibility = new MerOptimizerCompatibility();
+            Log.Info("MEROptimizer compatibility enabled");
+        }
+        else
+        {
+            Log.Debug("MEROptimizer compatibility disabled");
         }
     }
 

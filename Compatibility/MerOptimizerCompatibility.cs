@@ -6,7 +6,7 @@ namespace DynamicSchematicOptimizer.Compatibility;
 
 public class MerOptimizerCompatibility
 {
-    private readonly MEROptimizer.Application.MEROptimizer _merOptimizer;
+    private readonly object _merOptimizer;
 
     public MerOptimizerCompatibility()
     {
@@ -25,6 +25,8 @@ public class MerOptimizerCompatibility
             return false;
         }
 
-        return _merOptimizer.excludedNames.Any(n => name.ToLowerInvariant().Contains(n));
+
+        MEROptimizer.Application.MEROptimizer merOptimizer = (MEROptimizer.Application.MEROptimizer)_merOptimizer;
+        return merOptimizer.excludedNames.Any(n => name.ToLowerInvariant().Contains(n));
     }
 }

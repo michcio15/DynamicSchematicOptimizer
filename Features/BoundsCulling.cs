@@ -76,6 +76,7 @@ public class BoundsCulling
         Bounds bounds = new(position, Vector3.one * Radius * 2);
         bool isDebug = DrawableLines.IsDebugModeEnabled;
         DrawableLines.IsDebugModeEnabled = true;
+        DrawableLines.GenerateSphere(position, 1, 10, Color.red);
         DrawableLines.GenerateBounds(bounds, 10, Color.green);
         DrawableLines.IsDebugModeEnabled = isDebug;
     }
