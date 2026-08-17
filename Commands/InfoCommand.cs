@@ -98,8 +98,14 @@ public class InfoCommand : BaseOptimizerCommand, IUsageProvider
 
         if (!ConfigLoader.TryGetConfig(schematicName, out SchematicOptimisationConfig? config))
         {
-            response = $"{schematicName} is not optimized";
-            return false;
+            if (DynamicSchematicOptimizerPlugin.Instance.MEROCompatibility == null ||
+                !DynamicSchematicOptimizerPlugin.Instance.MEROCompatibility.ShouldSchematicBeOptimized(schematicName))
+            {
+                response = $"{schematicName} is not optimized";
+                return false;
+            }
+
+            config = DynamicSchematicOptimizerPlugin.Config.MeroSchematicDefaultConfig;
         }
 
         if (!config.Enabled)

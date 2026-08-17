@@ -15,11 +15,16 @@ public class MerOptimizerCompatibility
 
     public bool ShouldSchematicBeOptimized(SerializableSchematic serializableSchematic)
     {
-        if (DynamicSchematicOptimizerPlugin.Config.ExcludedMEROSchematics.Any(s => s == serializableSchematic.SchematicName))
+        return ShouldSchematicBeOptimized(serializableSchematic.SchematicName);
+    }
+
+    public bool ShouldSchematicBeOptimized(string name)
+    {
+        if (DynamicSchematicOptimizerPlugin.Config.ExcludedMEROSchematics.Any(s => s == name))
         {
             return false;
         }
 
-        return _merOptimizer.excludedNames.Any(n => serializableSchematic.SchematicName.ToLowerInvariant().Contains(n));
+        return _merOptimizer.excludedNames.Any(n => name.ToLowerInvariant().Contains(n));
     }
 }

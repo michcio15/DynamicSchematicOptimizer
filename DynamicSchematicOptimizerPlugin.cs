@@ -28,7 +28,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
 {
     private static Harmony _harmony = null!;
 
-    private MerOptimizerCompatibility _meroCompatibility = null!;
+    internal MerOptimizerCompatibility MEROCompatibility = null!;
 
     public static new Config Config { get; private set; } = null!;
     public static DynamicSchematicOptimizerPlugin Instance { get; private set; } = null!;
@@ -36,7 +36,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public override string Name { get; } = "Dynamic Schematic Optimizer";
     public override string Description { get; } = "Plugin for ProjectMER that optimizes schematics ";
     public override string Author { get; } = "michcio";
-    public override Version Version { get; } = new(1, 2, 0);
+    public override Version Version { get; } = new(1, 2, 1);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
 
     public override void Enable()
@@ -65,7 +65,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         _harmony.UnpatchAll(_harmony.Id);
         _harmony = null!;
 
-        _meroCompatibility = null!;
+        MEROCompatibility = null!;
 
         ConfigLoader.Disable();
         SchematicSync.Unregister();
@@ -82,7 +82,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
             try
             {
                 _ = typeof(MEROptimizer.Application.MEROptimizer);
-                _meroCompatibility = new MerOptimizerCompatibility();
+                MEROCompatibility = new MerOptimizerCompatibility();
             }
             catch (Exception)
             {
@@ -96,7 +96,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     {
         if (!ConfigLoader.TryGetConfig(ev.Schematic.SchematicName, out SchematicOptimisationConfig? optimisationConfig) || !optimisationConfig.Enabled)
         {
-            if (_meroCompatibility == null || !_meroCompatibility.ShouldSchematicBeOptimized(ev.Schematic))
+            if (MEROCompatibility == null || !MEROCompatibility.ShouldSchematicBeOptimized(ev.Schematic))
             {
                 Log.Debug($"{ev.Schematic.SchematicName} is not optimized");
                 return;
