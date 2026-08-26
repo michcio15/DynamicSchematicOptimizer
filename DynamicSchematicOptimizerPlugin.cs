@@ -12,6 +12,7 @@ using LabApi.Events.Handlers;
 using LabApi.Features;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
+using LabApi.Loader.Features.Plugins.Enums;
 
 using Mirror;
 
@@ -37,8 +38,9 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public override string Name { get; } = "Dynamic Schematic Optimizer";
     public override string Description { get; } = "Plugin for ProjectMER that optimizes schematics ";
     public override string Author { get; } = "michcio";
-    public override Version Version { get; } = new(1, 2, 2);
+    public override Version Version { get; } = new(1, 3, 0);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
+    public override LoadPriority Priority { get; } = LoadPriority.Low;
 
     public override void Enable()
     {
@@ -108,7 +110,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
 
             Log.Debug($"{ev.Schematic.SchematicName} is optimized because of MERO compatibility");
 
-            optimisationConfig = Config.MeroSchematicDefaultConfig;
+            optimisationConfig = Config.DefaultConfig;
         }
 
         SchematicSpawnPlan plan =

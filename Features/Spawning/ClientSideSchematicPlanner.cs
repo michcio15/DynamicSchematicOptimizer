@@ -1,3 +1,5 @@
+using AdminToys;
+
 using ProjectMER.Features.Enums;
 using ProjectMER.Features.Serializable.Schematics;
 
@@ -112,6 +114,12 @@ internal static class ClientSideSchematicPlanner
     {
         if (optimisationConfig.Primitive.Enabled && blockData.BlockType == BlockType.Primitive)
         {
+            if (blockData.Properties.TryGetValue("PrimitiveFlags", out object flags) && optimisationConfig.Primitive.DontOptimizeWithCollision &&
+                HasCollision(flags))
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -126,5 +134,11 @@ internal static class ClientSideSchematicPlanner
         }
 
         return false;
+
+        static bool HasCollision(object flags)
+        {
+            PrimitiveFlags primitiveFlags = (PrimitiveFlags)Convert.ToByte(flags);
+            return primitiveFlags.HasFlag(PrimitiveFlags.Collidable);
+        }
     }
 }

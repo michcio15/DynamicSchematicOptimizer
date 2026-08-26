@@ -6,10 +6,11 @@ public class SchematicOptimisationConfig
     public byte CullingDistance { get; set; } = 33;
     public byte MovementSmoothing { get; set; } = 60;
 
-    public AdminToyOptimisationConfig Primitive { get; set; } = new()
+    public PrimitiveToyOptimisationConfig Primitive { get; set; } = new()
     {
         Enabled = true,
         IsStatic = false,
+        DontOptimizeWithCollision = true,
     };
 
     public AdminToyOptimisationConfig LightSource { get; set; } = new()
@@ -23,6 +24,11 @@ public class SchematicOptimisationConfig
         Enabled = true,
         IsStatic = false,
     };
+}
+
+public class PrimitiveToyOptimisationConfig : AdminToyOptimisationConfig
+{
+    public bool DontOptimizeWithCollision { get; set; } = true;
 }
 
 public class AdminToyOptimisationConfig

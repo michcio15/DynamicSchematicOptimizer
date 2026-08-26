@@ -12,7 +12,8 @@ public class Config
     [Description("Names of schematics that will not be optimized by DSO if they are not optimized by MERO")]
     public List<string> ExcludedMEROSchematics { get; set; } = new();
 
-    public SchematicOptimisationConfig MeroSchematicDefaultConfig { get; set; } = new();
+    [Description("Default config for schematics that are not optimized by MERO if the compatiblity is enabled\nAlso will be the deafult for newly created schematics")]
+    public SchematicOptimisationConfig DefaultConfig { get; set; } = new();
 
     public float CullingTickTimeInBetween { get; set; } = 1;
 

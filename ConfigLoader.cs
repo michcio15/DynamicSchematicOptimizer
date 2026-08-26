@@ -42,7 +42,7 @@ public static class ConfigLoader
             return;
         }
 
-        SchematicOptimisationConfig config = new();
+        SchematicOptimisationConfig config = DynamicSchematicOptimizerPlugin.Config.DefaultConfig;
 
         string yaml = Serializer.Serialize(config);
         File.WriteAllText(filePath, yaml);

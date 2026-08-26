@@ -105,7 +105,7 @@ public class InfoCommand : BaseOptimizerCommand, IUsageProvider
                 return false;
             }
 
-            config = DynamicSchematicOptimizerPlugin.Config.MeroSchematicDefaultConfig;
+            config = DynamicSchematicOptimizerPlugin.Config.DefaultConfig;
         }
 
         if (!config.Enabled)
