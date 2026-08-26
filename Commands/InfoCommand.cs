@@ -90,7 +90,8 @@ public class InfoCommand : BaseOptimizerCommand, IUsageProvider
                 serverSidedToys += schematic.SchematicObject.AdminToyBases.Count;
             }
 
-            response = $"Spawned schematics: {SchematicSync.ByNetID.Values.Count} | Client sided: {clientSidedToys} | Server sided: {serverSidedToys}";
+            response = $"Spawned schematics: {SchematicSync.ByNetID.Values.Count}\n" +
+                       $"Client sided: {clientSidedToys} | Server sided: {serverSidedToys}\n";
             return true;
         }
 
