@@ -5,6 +5,7 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -82,9 +83,13 @@
         <Reference Include="YamlDotNet">
             <HintPath>$(SL_REFERENCES)\YamlDotNet.dll</HintPath>
         </Reference>
-        <Reference Include="mscorlib">
-            <HintPath>$(SL_REFERENCES)\mscorlib.dll</HintPath>
-        </Reference>
+        <Reference Include="mscorlib" HintPath="$(SL_REFERENCES)\mscorlib.dll"/>
+        <Reference Include="System" HintPath="$(SL_REFERENCES)\System.dll"/>
+        <Reference Include="System.Core" HintPath="$(SL_REFERENCES)\System.Core.dll"/>
+        <Reference Include="netstandard" HintPath="$(SL_REFERENCES)\netstandard.dll"/>
+        <Reference Include="System.Drawing" HintPath="$(SL_REFERENCES)\System.Drawing.dll"/>
+        <Reference Include="System.Data" HintPath="$(SL_REFERENCES)\System.Data.dll"/>
+        <Reference Include="System.Net.Http" HintPath="$(SL_REFERENCES)\System.Net.Http.dll"/>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(SL_REFERENCES)\UnityEngine.CoreModule.dll</HintPath>
         </Reference>

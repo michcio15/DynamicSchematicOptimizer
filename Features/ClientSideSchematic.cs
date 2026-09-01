@@ -23,6 +23,10 @@ public class ClientSidedSchematic
     }
 
     public HashSet<Player> Spawned { get; set; } = new();
+
+    /// <summary>
+    /// Should <see cref="Player"/> be ignored with <see cref="BoundsCulling"/>
+    /// </summary>
     public HashSet<Player> Ignored { get; set; } = new();
 
     public List<ClientSideAdminToy> Toys { get; }
@@ -42,11 +46,21 @@ public class ClientSidedSchematic
 
     public void Spawn(Player player)
     {
+        if (Spawned.Contains(player))
+        {
+            Log.Warn($"Player {player.Nickname} already spawned {SchematicObject.name}!");
+            return;
+        }
+
         Toys.ForEach(toy => toy.Spawn(player.Connection));
         Spawned.Add(player);
         Log.Debug($"Spawning {SchematicObject.name} for {player.Nickname}");
     }
 
+    /// <summary>
+    /// Destroys all of the <see cref="Toys"/> for the player, server-sided toys stay.
+    /// </summary>
+    /// <param name="player"><see cref="Player"/> for whom the toys will be destroyed</param>
     public void Destroy(Player player)
     {
         for (int i = Toys.Count - 1; i >= 0; i--)
@@ -63,6 +77,7 @@ public class ClientSidedSchematic
     /// </summary>
     /// <param name="player">The player that will schematic be destoryed for</param>
     /// <param name="addToIgnored">If <see langword="true"/> then player will be added to <see cref="Ignored"/> so culling won't spawn it.</param>
+    /// <remarks>This action cannot be undone only use this if you have, for example, a custom model for a player, and you don't want him to see it.</remarks>
     public void DestroyWithSchematic(Player player, bool addToIgnored = true)
     {
         Destroy(player);

@@ -62,6 +62,11 @@ public class BoundsCulling
             return true;
         }
 
+        if (position == Vector3.zero)
+        {
+            return true;
+        }
+
         if ((position - player.Position).sqrMagnitude <= Radius * Radius)
         {
             return true;
