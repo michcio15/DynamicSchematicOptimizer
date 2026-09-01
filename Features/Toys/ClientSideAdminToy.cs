@@ -8,17 +8,92 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public abstract class ClientSideAdminToy
 {
-    private bool _spawnMessageSet = false;
+    private const int RpcChangeParentHashCode = -342419096;
 
-    private SpawnMessage _spawnMessage;
+    protected ulong DirtyBits = 0UL;
 
-    public Vector3 Position { get; set; }
-    public Quaternion Rotation { get; set; }
-    public Vector3 Scale { get; set; }
-    public byte MovementSmoothing { get; set; }
-    public bool IsStatic { get; set; }
+    protected SpawnMessage? CachedSpawnMessage;
 
-    public uint ParentNetId { get; set; }
+    protected EntityStateMessage? CachedEntityStateMessage;
+
+    //private bool _parentDirty = false;
+
+    public Vector3 Position
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 1UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public Quaternion Rotation
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 2UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public Vector3 Scale
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 4UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public byte MovementSmoothing
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 8UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public bool IsStatic
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 16UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public uint ParentNetId
+    {
+        get;
+
+        set
+        {
+            field = value;
+            //_parentDirty = true;
+            CachedSpawnMessage = null;
+        }
+    }
 
     public uint NetId
     {
@@ -49,49 +124,14 @@ public abstract class ClientSideAdminToy
         return this;
     }
 
-    public SpawnMessage GetSpawnMessage(NetworkWriter writer)
-    {
-        if (_spawnMessageSet)
-        {
-            return _spawnMessage;
-        }
-
-        Compression.CompressVarUInt(writer, 1UL);
-
-        int headerPos = writer.Position;
-        writer.WriteByte(0);
-        int contentPos = writer.Position;
-        WriteSyncObjects(writer);
-        WriteSyncVars(writer);
-        WriteOnSerialize(writer);
-        int endPos = writer.Position;
-        writer.Position = headerPos;
-        writer.WriteByte((byte)((endPos - contentPos) & 0xFF));
-        writer.Position = endPos;
-
-        _spawnMessage = new SpawnMessage
-        {
-            assetId = AssetID,
-            position = Position,
-            rotation = Rotation,
-            scale = Scale,
-            netId = NetId,
-            payload = new ArraySegment<byte>(writer.ToArray()),
-        };
-        _spawnMessageSet = true;
-        return _spawnMessage;
-    }
-
     public void Spawn(NetworkConnection conn)
     {
-        using NetworkWriterPooled writer = NetworkWriterPool.Get();
-        conn.Send(GetSpawnMessage(writer));
+        conn.Send(GetSpawnMessage());
     }
 
     public void SpawnForAll()
     {
-        using NetworkWriterPooled writer = NetworkWriterPool.Get();
-        SpawnMessage spawnMessage = GetSpawnMessage(writer);
+        SpawnMessage spawnMessage = GetSpawnMessage();
 
         foreach (Player p in Player.ReadyList)
         {
@@ -119,6 +159,67 @@ public abstract class ClientSideAdminToy
         }
     }
 
+    public void Sync(NetworkConnection conn)
+    {
+        EntityStateMessage entityStateMessage = GetEntityStateMessage();
+        conn.Send(entityStateMessage);
+    }
+
+
+    public SpawnMessage GetSpawnMessage()
+    {
+        if (CachedSpawnMessage.HasValue)
+        {
+            return CachedSpawnMessage.Value;
+        }
+
+        using NetworkWriterPooled writer = NetworkWriterPool.Get();
+
+        Compression.CompressVarUInt(writer, 1UL);
+
+        int headerPos = writer.Position;
+        writer.WriteByte(0);
+        int contentPos = writer.Position;
+        WriteSyncObjects(writer);
+        WriteSyncVars(writer);
+        WriteOnSerialize(writer);
+        int endPos = writer.Position;
+        writer.Position = headerPos;
+        writer.WriteByte((byte)((endPos - contentPos) & 0xFF));
+        writer.Position = endPos;
+
+        CachedSpawnMessage = new SpawnMessage
+        {
+            assetId = AssetID,
+            position = Position,
+            rotation = Rotation,
+            scale = Scale,
+            netId = NetId,
+            payload = new ArraySegment<byte>(writer.ToArray()),
+        };
+        return CachedSpawnMessage.Value;
+    }
+
+    public EntityStateMessage GetEntityStateMessage()
+    {
+        if (CachedEntityStateMessage.HasValue)
+        {
+            return CachedEntityStateMessage.Value;
+        }
+
+        using NetworkWriterPooled writer = NetworkWriterPool.Get();
+
+        EntityStateMessage entityStateMessage = new()
+        {
+            netId = NetId,
+            payload = new ArraySegment<byte>(writer.ToArray()),
+        };
+
+        CachedEntityStateMessage = entityStateMessage;
+        DirtyBits = 0;
+        return CachedEntityStateMessage.Value;
+    }
+
     protected virtual void WriteOnSerialize(NetworkWriter writer)
     {
         writer.Write(ParentNetId);
@@ -135,5 +236,46 @@ public abstract class ClientSideAdminToy
 
     protected virtual void WriteSyncObjects(NetworkWriter writer)
     {
+    }
+
+    protected virtual void WriteSync(NetworkWriter writer)
+    {
+        if ((DirtyBits & 1UL) != 0)
+        {
+            writer.WriteVector3(Position);
+        }
+
+        if ((DirtyBits & 2UL) != 0)
+        {
+            writer.WriteQuaternion(Rotation);
+        }
+
+        if ((DirtyBits & 4UL) != 0)
+        {
+            writer.WriteVector3(Scale);
+        }
+
+        if ((DirtyBits & 8UL) != 0)
+        {
+            writer.WriteByte(MovementSmoothing);
+        }
+
+        if ((DirtyBits & 16UL) != 0)
+        {
+            writer.WriteBool(IsStatic);
+        }
+    }
+
+    private void SendChangeParent(NetworkConnection connection)
+    {
+        using NetworkWriterPooled writer = NetworkWriterPool.Get();
+        writer.WriteUInt(ParentNetId);
+        connection.Send(new RpcMessage
+        {
+            netId = NetId,
+            componentIndex = 0,
+            functionHash = unchecked((ushort)RpcChangeParentHashCode),
+            payload = writer.ToArraySegment(),
+        });
     }
 }

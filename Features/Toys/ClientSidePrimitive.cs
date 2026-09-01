@@ -10,9 +10,45 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public class ClientSidePrimitive : ClientSideAdminToy
 {
-    public PrimitiveType Type { get; set; }
-    public Color Color { get; set; }
-    public PrimitiveFlags Flags { get; set; }
+    public PrimitiveType Type
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 32UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public Color Color
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 64UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
+    public PrimitiveFlags Flags
+    {
+        get;
+
+        set
+        {
+            field = value;
+            DirtyBits |= 128UL;
+            CachedEntityStateMessage = null;
+            CachedSpawnMessage = null;
+        }
+    }
+
     protected override uint AssetID { get; } = PrefabManager.PrimitiveObject.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
@@ -21,5 +57,25 @@ public class ClientSidePrimitive : ClientSideAdminToy
         writer.Write(Type);
         writer.WriteColor(Color);
         writer.Write(Flags);
+    }
+
+    protected override void WriteSync(NetworkWriter writer)
+    {
+        base.WriteSync(writer);
+
+        if ((DirtyBits & 32UL) != 0)
+        {
+            writer.Write(Type);
+        }
+
+        if ((DirtyBits & 64UL) != 0)
+        {
+            writer.WriteColor(Color);
+        }
+
+        if ((DirtyBits & 128UL) != 0)
+        {
+            writer.Write(Flags);
+        }
     }
 }
