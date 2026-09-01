@@ -59,9 +59,11 @@ public class ClientSidePrimitive : ClientSideAdminToy
         writer.Write(Flags);
     }
 
-    protected override void WriteSync(NetworkWriter writer)
+    protected override void WriteSyncVarsDelta(NetworkWriter writer)
     {
-        base.WriteSync(writer);
+        base.WriteSyncVarsDelta(writer);
+
+        writer.WriteULong(DirtyBits);
 
         if ((DirtyBits & 32UL) != 0)
         {

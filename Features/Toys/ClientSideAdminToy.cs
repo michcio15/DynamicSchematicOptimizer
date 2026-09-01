@@ -209,14 +209,28 @@ public abstract class ClientSideAdminToy
 
         using NetworkWriterPooled writer = NetworkWriterPool.Get();
 
-        EntityStateMessage entityStateMessage = new()
+        Compression.CompressVarUInt(writer, 1UL);
+
+        int headerPos = writer.Position;
+        writer.WriteByte(0);
+        int contentPos = writer.Position;
+
+        writer.WriteULong(0UL);
+
+        WriteSyncVarsDelta(writer);
+
+        int endPos = writer.Position;
+        writer.Position = headerPos;
+        writer.WriteByte((byte)((endPos - contentPos) & 0xFF));
+        writer.Position = endPos;
+
+        CachedEntityStateMessage = new EntityStateMessage
         {
             netId = NetId,
             payload = new ArraySegment<byte>(writer.ToArray()),
         };
 
-        CachedEntityStateMessage = entityStateMessage;
-        DirtyBits = 0;
+        DirtyBits = 0UL;
         return CachedEntityStateMessage.Value;
     }
 
@@ -238,8 +252,10 @@ public abstract class ClientSideAdminToy
     {
     }
 
-    protected virtual void WriteSync(NetworkWriter writer)
+    protected virtual void WriteSyncVarsDelta(NetworkWriter writer)
     {
+        writer.WriteULong(DirtyBits);
+
         if ((DirtyBits & 1UL) != 0)
         {
             writer.WriteVector3(Position);
