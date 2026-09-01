@@ -165,6 +165,15 @@ public abstract class ClientSideAdminToy
         conn.Send(entityStateMessage);
     }
 
+    public void SyncForAll()
+    {
+        EntityStateMessage entityStateMessage = GetEntityStateMessage();
+        foreach (Player p in Player.ReadyList)
+        {
+            p.Connection.Send(entityStateMessage);
+        }
+    }
+
 
     public SpawnMessage GetSpawnMessage()
     {
@@ -214,8 +223,6 @@ public abstract class ClientSideAdminToy
         int headerPos = writer.Position;
         writer.WriteByte(0);
         int contentPos = writer.Position;
-
-        writer.WriteULong(0UL);
 
         WriteSyncVarsDelta(writer);
 
