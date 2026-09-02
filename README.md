@@ -4,8 +4,8 @@ This is a ProjectMER optimizer for schematics that are meant to be animated / mo
 
 ## Why shouldn't I just use MERO?
 
-Because it's not a replacement for MERO, more like an extension.
-DSO also has a MERO compatibility that can be enabled in the Config.yml file. Enabling it will make the plugin optimize schematics that are excluded from MERO.
+Because it's not a replacement for MERO, more like an extension. DSO also has a MERO compatibility that can be enabled
+in the Config.yml file. Enabling it will make the plugin optimize schematics that are excluded from MERO.
 
 # How to use it?
 

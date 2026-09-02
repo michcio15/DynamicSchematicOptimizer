@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using DynamicSchematicOptimizer.Features.Culling;
+
+using JetBrains.Annotations;
 
 using Mirror;
 
@@ -8,7 +10,7 @@ using Player = LabApi.Features.Wrappers.Player;
 
 namespace DynamicSchematicOptimizer.Features.Toys;
 
-public abstract class ClientSideAdminToy
+public abstract class ClientSideAdminToy : ICullable
 {
     private const int RpcChangeParentHashCode = -342419096;
 
@@ -17,6 +19,34 @@ public abstract class ClientSideAdminToy
     protected SpawnMessage? CachedSpawnMessage;
 
     protected EntityStateMessage? CachedEntityStateMessage;
+
+    public void Spawn(Player player)
+    {
+        player.Connection.Send(GetSpawnMessage());
+
+        CullingProvider?.Spawned.Add(player);
+    }
+
+    public void Destroy(Player player)
+    {
+        player.Connection.Send(new ObjectDestroyMessage
+        {
+            netId = NetId,
+        });
+
+        CullingProvider?.Spawned.Remove(player);
+    }
+
+    public Vector3 GetWorldPosition()
+    {
+        if (ParentNetId == 0UL)
+        {
+            return Position;
+        }
+
+        Log.Warn("I ");
+        return Position;
+    }
 
     //private bool _parentDirty = false;
 
@@ -134,11 +164,6 @@ public abstract class ClientSideAdminToy
         return this;
     }
 
-    public void Spawn(NetworkConnection conn)
-    {
-        conn.Send(GetSpawnMessage());
-    }
-
     public void SpawnForAll()
     {
         SpawnMessage spawnMessage = GetSpawnMessage();
@@ -146,15 +171,8 @@ public abstract class ClientSideAdminToy
         foreach (Player p in Player.ReadyList)
         {
             p.Connection.Send(spawnMessage);
+            CullingProvider?.Spawned.Add(p);
         }
-    }
-
-    public void Destroy(NetworkConnection conn)
-    {
-        conn.Send(new ObjectDestroyMessage
-        {
-            netId = NetId,
-        });
     }
 
     public void DestroyForAll()
@@ -167,6 +185,8 @@ public abstract class ClientSideAdminToy
         {
             p.Connection.Send(msg);
         }
+
+        CullingProvider?.Spawned.Clear();
     }
 
     public void Sync()

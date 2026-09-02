@@ -1,11 +1,11 @@
 #if DEBUG
-using System.Diagnostics.CodeAnalysis;
 
-using AdminToys;
+using System.Diagnostics.CodeAnalysis;
 
 using CommandSystem;
 
 using DynamicSchematicOptimizer.Features;
+using DynamicSchematicOptimizer.Features.Culling;
 using DynamicSchematicOptimizer.Features.Toys;
 
 using LabApi.Features.Wrappers;
@@ -29,13 +29,16 @@ public class TestCommand : ICommand
             Position = player.Position,
             Rotation = player.Rotation,
         };
-        textToy.Spawn(player.Connection);
-        Timing.CallDelayed(5, () =>
+        textToy.CullingProvider = new SphereCullingProvider(textToy);
+        //sphereCullingProvider.Spawned.Add(player);
+        textToy.Spawn(player);
+        SchematicSync.CullingProviders.Add(textToy.CullingProvider);
+        /*Timing.CallDelayed(5, () =>
         {
             textToy.TextFormat = "Goodbye World";
             textToy.Position = player.Position + new Vector3(0, 1, 0);
             textToy.Sync();
-        });
+        });*/
         response = string.Empty;
         return true;
     }
@@ -45,16 +48,3 @@ public class TestCommand : ICommand
     public string Description { get; } = "test";
 }
 #endif
-
-public class TestCulling : ICullingProvider
-{
-    public void Tick()
-    {
-        Log.Info("tick");
-    }
-
-    public void ShowDebugBounds()
-    {
-        
-    }
-}

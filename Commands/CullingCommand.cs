@@ -2,7 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 
 using CommandSystem;
 
+using DrawableLine;
+
 using DynamicSchematicOptimizer.Features;
+using DynamicSchematicOptimizer.Features.Culling;
 
 using LabApi.Features.Wrappers;
 
@@ -79,10 +82,15 @@ public class CullingCommand : BaseOptimizerCommand, IUsageProvider
             return false;
         }
 
+        bool isDebug = DrawableLines.IsDebugModeEnabled;
+        DrawableLines.IsDebugModeEnabled = true;
+
         foreach (ICullingProvider cullingProvider in SchematicSync.CullingProviders)
         {
             cullingProvider.ShowDebugBounds();
         }
+
+        DrawableLines.IsDebugModeEnabled = isDebug;
 
         response = "Culling bounds shown";
         return true;

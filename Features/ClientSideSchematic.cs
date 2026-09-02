@@ -1,3 +1,4 @@
+using DynamicSchematicOptimizer.Features.Culling;
 using DynamicSchematicOptimizer.Features.Toys;
 
 using JetBrains.Annotations;
@@ -6,12 +7,14 @@ using Mirror;
 
 using ProjectMER.Features.Objects;
 
+using UnityEngine;
+
 using Player = LabApi.Features.Wrappers.Player;
 
 namespace DynamicSchematicOptimizer.Features;
 
 [PublicAPI]
-public class ClientSidedSchematic
+public class ClientSidedSchematic : ICullable
 {
     public ClientSidedSchematic(uint netID, List<ClientSideAdminToy> toys, SchematicObject schematicObject, SchematicOptimisationConfig optimisationConfig)
     {
@@ -19,29 +22,7 @@ public class ClientSidedSchematic
         Toys = toys;
         SchematicObject = schematicObject;
         OptimisationConfig = optimisationConfig;
-        BoundsCulling = new BoundsCulling(this);
-    }
-
-    public HashSet<Player> Spawned { get; set; } = new();
-
-    /// <summary>
-    /// Should <see cref="Player"/> be ignored with <see cref="BoundsCulling"/>
-    /// </summary>
-    public HashSet<Player> Ignored { get; set; } = new();
-
-    public List<ClientSideAdminToy> Toys { get; }
-
-    public SchematicOptimisationConfig OptimisationConfig { get; }
-    public uint NetID { get; set; }
-    public BoundsCulling BoundsCulling { get; private set; }
-    public SchematicObject SchematicObject { get; }
-
-    public void SpawnForAll()
-    {
-        foreach (Player player in Player.ReadyList)
-        {
-            Spawn(player);
-        }
+        SchematicCullingProvider = new SchematicCullingProvider(this);
     }
 
     public void Spawn(Player player)
@@ -52,7 +33,7 @@ public class ClientSidedSchematic
             return;
         }
 
-        Toys.ForEach(toy => toy.Spawn(player.Connection));
+        Toys.ForEach(toy => toy.Spawn(player));
         Spawned.Add(player);
         Log.Debug($"Spawning {SchematicObject.name} for {player.Nickname}");
     }
@@ -65,11 +46,38 @@ public class ClientSidedSchematic
     {
         for (int i = Toys.Count - 1; i >= 0; i--)
         {
-            Toys[i].Destroy(player.Connection);
+            Toys[i].Destroy(player);
         }
 
         Spawned.Remove(player);
         Log.Debug($"Destroying {SchematicObject.name} for {player.Nickname}");
+    }
+
+    public Vector3 GetWorldPosition()
+    {
+        return SchematicObject.Position;
+    }
+
+    public HashSet<Player> Spawned { get; set; } = new();
+
+    /// <summary>
+    /// Should <see cref="Player"/> be ignored with <see cref="SchematicCullingProvider"/>
+    /// </summary>
+    public HashSet<Player> Ignored { get; set; } = new();
+
+    public List<ClientSideAdminToy> Toys { get; }
+
+    public SchematicOptimisationConfig OptimisationConfig { get; }
+    public uint NetID { get; set; }
+    public SchematicCullingProvider SchematicCullingProvider { get; private set; }
+    public SchematicObject SchematicObject { get; }
+
+    public void SpawnForAll()
+    {
+        foreach (Player player in Player.ReadyList)
+        {
+            Spawn(player);
+        }
     }
 
     /// <summary>
