@@ -10,7 +10,7 @@ using Player = LabApi.Features.Wrappers.Player;
 
 namespace DynamicSchematicOptimizer.Features;
 
-public class BoundsCulling
+public class BoundsCulling : ICullingProvider
 {
     public BoundsCulling(ClientSidedSchematic clientSidedSchematic)
     {
@@ -82,7 +82,7 @@ public class BoundsCulling
         bool isDebug = DrawableLines.IsDebugModeEnabled;
         DrawableLines.IsDebugModeEnabled = true;
         DrawableLines.GenerateSphere(position, 1, 10, Color.red);
-        DrawableLines.GenerateBounds(bounds, 10, Color.green);
+        DrawableLines.GenerateSphere(position, Radius, Color.green);
         DrawableLines.IsDebugModeEnabled = isDebug;
     }
 }

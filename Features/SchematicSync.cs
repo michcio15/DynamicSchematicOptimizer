@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 
+using JetBrains.Annotations;
+
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 
@@ -10,6 +12,12 @@ namespace DynamicSchematicOptimizer.Features;
 public static class SchematicSync
 {
     internal static readonly Dictionary<uint, ClientSidedSchematic> ByNetID = new();
+
+    /// <summary>
+    /// If you have a custom <see cref="ICullingProvider"/> per toy you should add it here.
+    /// </summary>
+    [PublicAPI]
+    public static readonly List<ICullingProvider> CullingProviders = new();
 
     private static float _timeBetweenTicks = 0;
 
@@ -31,6 +39,7 @@ public static class SchematicSync
 
         schematic.Destroy();
 
+        CullingProviders.Remove(schematic.BoundsCulling);
         ByNetID.Remove(netID);
         if (ByNetID.Count == 0 && _coroutineHandle != null)
         {
@@ -46,6 +55,7 @@ public static class SchematicSync
     public static void AddSchematic(ClientSidedSchematic schematic)
     {
         ByNetID.Add(schematic.NetID, schematic);
+        CullingProviders.Add(schematic.BoundsCulling);
         _coroutineHandle ??= Timing.RunCoroutine(SpawningCoroutine());
     }
 
@@ -88,11 +98,11 @@ public static class SchematicSync
 
     private static IEnumerator<float> SpawningCoroutine()
     {
-        while (ByNetID.Count > 0)
+        while (CullingProviders.Count > 0)
         {
-            foreach (ClientSidedSchematic schematic in ByNetID.Values)
+            foreach (ICullingProvider cullingProvider in CullingProviders)
             {
-                schematic.BoundsCulling.Tick();
+                cullingProvider.Tick();
             }
 
             yield return Timing.WaitForSeconds(_timeBetweenTicks);

@@ -110,7 +110,7 @@ internal static class ClientSideSchematicBuilder
         Dictionary<string, object> properties = block.Properties;
 
         text.TextFormat = Convert.ToString(properties["Text"]);
-        text.Size = properties["DisplaySize"].ToVector2() * 20f;
+        text.DisplaySize = properties["DisplaySize"].ToVector2() * 20f;
         text.IsStatic = optimisationConfigTextToy.IsStatic;
         return text;
     }

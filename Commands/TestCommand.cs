@@ -5,6 +5,7 @@ using AdminToys;
 
 using CommandSystem;
 
+using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Toys;
 
 using LabApi.Features.Wrappers;
@@ -20,24 +21,20 @@ public class TestCommand : ICommand
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
     {
         Player player = Player.Get(sender)!;
-        ClientSidePrimitive clientSidePrimitive = new()
+        ClientSideTextToy textToy = new()
         {
-            Position = player.Position,
-            Color = Color.blue,
-            Type = PrimitiveType.Sphere,
-            Flags = PrimitiveFlags.Visible,
+            DisplaySize = new Vector2(50, 50),
+            TextFormat = "Hello World",
             IsStatic = false,
-            MovementSmoothing = 60,
-            ParentNetId = 0,
+            Position = player.Position,
             Rotation = player.Rotation,
-            Scale = Vector3.one,
         };
-        clientSidePrimitive.Spawn(player.Connection);
+        textToy.Spawn(player.Connection);
         Timing.CallDelayed(5, () =>
         {
-            clientSidePrimitive.Color = Color.red;
-            clientSidePrimitive.Rotation = player.Rotation;
-            clientSidePrimitive.Sync(player.Connection);
+            textToy.TextFormat = "Goodbye World";
+            textToy.Position = player.Position + new Vector3(0, 1, 0);
+            textToy.Sync();
         });
         response = string.Empty;
         return true;
@@ -48,3 +45,16 @@ public class TestCommand : ICommand
     public string Description { get; } = "test";
 }
 #endif
+
+public class TestCulling : ICullingProvider
+{
+    public void Tick()
+    {
+        Log.Info("tick");
+    }
+
+    public void ShowDebugBounds()
+    {
+        
+    }
+}

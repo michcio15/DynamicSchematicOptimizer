@@ -79,9 +79,9 @@ public class CullingCommand : BaseOptimizerCommand, IUsageProvider
             return false;
         }
 
-        foreach (ClientSidedSchematic clientSidedSchematic in SchematicSync.ByNetID.Values)
+        foreach (ICullingProvider cullingProvider in SchematicSync.CullingProviders)
         {
-            clientSidedSchematic.BoundsCulling.ShowDebugBounds();
+            cullingProvider.ShowDebugBounds();
         }
 
         response = "Culling bounds shown";

@@ -1,3 +1,5 @@
+using AdminToys;
+
 using Mirror;
 
 using ProjectMER.Features;
@@ -8,7 +10,7 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public class ClientSideTextToy : ClientSideAdminToy
 {
-    public Vector2 Size
+    public Vector2 DisplaySize
     {
         get;
 
@@ -19,7 +21,7 @@ public class ClientSideTextToy : ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = TextToy.DefaultDisplaySize;
 
     public string TextFormat
     {
@@ -32,14 +34,14 @@ public class ClientSideTextToy : ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    } = string.Empty;
+    } = "Please write smth here <3";
 
     protected override uint AssetID { get; } = PrefabManager.Text.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
     {
         base.WriteSyncVars(writer);
-        writer.WriteVector2(Size);
+        writer.WriteVector2(DisplaySize);
         writer.WriteString(TextFormat);
     }
 
@@ -52,13 +54,16 @@ public class ClientSideTextToy : ClientSideAdminToy
 
     protected override void WriteSyncVarsDelta(NetworkWriter writer)
     {
+        // I would like to send my love to the jebana kurwa synclist.
+        writer.WriteULong(0);
+
         base.WriteSyncVarsDelta(writer);
 
         writer.WriteULong(DirtyBits);
 
         if ((DirtyBits & 32UL) != 0)
         {
-            writer.Write(Size);
+            writer.WriteVector2(DisplaySize);
         }
 
         if ((DirtyBits & 64UL) != 0)

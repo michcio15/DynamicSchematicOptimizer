@@ -1,4 +1,6 @@
-﻿using Mirror;
+﻿using JetBrains.Annotations;
+
+using Mirror;
 
 using UnityEngine;
 
@@ -29,7 +31,7 @@ public abstract class ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = Vector3.zero;
 
     public Quaternion Rotation
     {
@@ -42,7 +44,7 @@ public abstract class ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = Quaternion.identity;
 
     public Vector3 Scale
     {
@@ -55,7 +57,7 @@ public abstract class ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = Vector3.one;
 
     public byte MovementSmoothing
     {
@@ -68,7 +70,7 @@ public abstract class ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = 60;
 
     public bool IsStatic
     {
@@ -81,7 +83,7 @@ public abstract class ClientSideAdminToy
             CachedEntityStateMessage = null;
             CachedSpawnMessage = null;
         }
-    }
+    } = false;
 
     public uint ParentNetId
     {
@@ -93,7 +95,7 @@ public abstract class ClientSideAdminToy
             //_parentDirty = true;
             CachedSpawnMessage = null;
         }
-    }
+    } = 0;
 
     public uint NetId
     {
@@ -107,6 +109,14 @@ public abstract class ClientSideAdminToy
             return field;
         }
     } = 0;
+
+    /// <summary>
+    /// Gets or sets the <see cref="ICullingProvider"/> that will be used to determine if the toy should be culled.
+    /// Useful when you have a <see cref="AdminToys.TextToy"/> thats large.
+    /// </summary>
+    /// <remarks>Needs to be added to <see cref="SchematicSync.CullingProviders"/> in order to work.</remarks>
+    [PublicAPI]
+    public ICullingProvider? CullingProvider { get; set; } = null;
 
     protected abstract uint AssetID { get; }
 
@@ -159,13 +169,7 @@ public abstract class ClientSideAdminToy
         }
     }
 
-    public void Sync(NetworkConnection conn)
-    {
-        EntityStateMessage entityStateMessage = GetEntityStateMessage();
-        conn.Send(entityStateMessage);
-    }
-
-    public void SyncForAll()
+    public void Sync()
     {
         EntityStateMessage entityStateMessage = GetEntityStateMessage();
         foreach (Player p in Player.ReadyList)
