@@ -55,7 +55,15 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         SchematicSync.Register();
 
 #if !DEBUG
-        _ = AutoUpdater.CheckForUpdateAsync();
+        if (Config.EnableAutoUpdater)
+        {
+            _ = AutoUpdater.CheckForUpdateAsync();
+        }
+        else
+        {
+
+            Log.Debug("Auto updater is disabled");
+        }
 #endif
 
         SchematicEventHandler.SchematicSpawning += OnSchematicSpawning;

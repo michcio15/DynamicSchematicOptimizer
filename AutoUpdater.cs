@@ -15,12 +15,6 @@ internal static class AutoUpdater
 
     public static async Task CheckForUpdateAsync()
     {
-        if (!DynamicSchematicOptimizerPlugin.Config.EnableAutoUpdater)
-        {
-            Log.Debug("Auto updater is disabled");
-            return;
-        }
-
         try
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
