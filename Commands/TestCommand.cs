@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using CommandSystem;
 
+using DynamicSchematicOptimizer.Extensions;
 using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Culling;
 using DynamicSchematicOptimizer.Features.Toys;
@@ -29,16 +30,9 @@ public class TestCommand : ICommand
             Position = player.Position,
             Rotation = player.Rotation,
         };
-        textToy.CullingProvider = new SphereCullingProvider(textToy);
-        //sphereCullingProvider.Spawned.Add(player);
-        textToy.Spawn(player);
-        SchematicSync.CullingProviders.Add(textToy.CullingProvider);
-        /*Timing.CallDelayed(5, () =>
-        {
-            textToy.TextFormat = "Goodbye World";
-            textToy.Position = player.Position + new Vector3(0, 1, 0);
-            textToy.Sync();
-        });*/
+        textToy.SpawnForAll();
+        textToy.AddCulling(new SphereCullingProvider(textToy));
+
         response = string.Empty;
         return true;
     }

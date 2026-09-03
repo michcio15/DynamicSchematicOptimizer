@@ -12,6 +12,7 @@ using MEC;
 
 namespace DynamicSchematicOptimizer.Features;
 
+[PublicAPI]
 public static class SchematicSync
 {
     /// <summary>
@@ -26,13 +27,27 @@ public static class SchematicSync
 
     private static CoroutineHandle? _coroutineHandle = null;
 
+    /// <summary>
+    /// All <see cref="ClientSidedSchematic"/>s that are currently spawned.
+    /// </summary>
     public static IReadOnlyCollection<ClientSidedSchematic> Schematics => ByNetID.Values;
 
+    /// <summary>
+    /// Attempts to retrieve the <see cref="ClientSidedSchematic"/> associated with the specified <paramref name="netID"/>.
+    /// </summary>
+    /// <param name="netID">The network ID of the schematic to retrieve.</param>
+    /// <param name="schematic">The retrieved <see cref="ClientSidedSchematic"/> if successfully found; otherwise, null.</param>
+    /// <returns><see langword="true"/> if the schematic was successfully retrieved; otherwise, <see langword="false"/>.</returns>
     public static bool TryGetSchematic(uint netID, [NotNullWhen(true)] out ClientSidedSchematic? schematic)
     {
         return ByNetID.TryGetValue(netID, out schematic);
     }
 
+    /// <summary>
+    /// Tries to destroy the <see cref="ClientSidedSchematic"/> with the given <paramref name="netID"/> found in <see cref="ByNetID"/>.
+    /// </summary>
+    /// <param name="netID">The <see cref="ClientSidedSchematic"/> netID</param>
+    /// <returns>Did it succeed</returns>
     public static bool TryDestroySchematic(uint netID)
     {
         if (!ByNetID.TryGetValue(netID, out ClientSidedSchematic? schematic))
@@ -63,6 +78,10 @@ public static class SchematicSync
         return true;
     }
 
+    /// <summary>
+    /// Adds <paramref name="schematic"/> to the <see cref="ByNetID"/> and <see cref="CullingProviders"/>.
+    /// </summary>
+    /// <param name="schematic"><see cref="ClientSidedSchematic"/> that will be added</param>
     public static void AddSchematic(ClientSidedSchematic schematic)
     {
         ByNetID.Add(schematic.NetID, schematic);

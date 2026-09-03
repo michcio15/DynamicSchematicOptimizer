@@ -20,6 +20,7 @@ public abstract class ClientSideAdminToy : ICullable
 
     protected EntityStateMessage? CachedEntityStateMessage;
 
+    /// <inheritdoc />
     public void Spawn(Player player)
     {
         player.Connection.Send(GetSpawnMessage());
@@ -27,6 +28,7 @@ public abstract class ClientSideAdminToy : ICullable
         CullingProvider?.Spawned.Add(player);
     }
 
+    /// <inheritdoc />
     public void Destroy(Player player)
     {
         player.Connection.Send(new ObjectDestroyMessage
@@ -37,19 +39,17 @@ public abstract class ClientSideAdminToy : ICullable
         CullingProvider?.Spawned.Remove(player);
     }
 
+    /// <inheritdoc />
     public Vector3 GetWorldPosition()
     {
-        if (ParentNetId == 0UL)
-        {
-            return Position;
-        }
-
-        Log.Warn("I ");
         return Position;
     }
 
     //private bool _parentDirty = false;
 
+    /// <summary>
+    /// Gets or sets the position of the toy relative to the <see cref="Transform"/> of the <see cref="ParentNetId"/>.
+    /// </summary>
     public Vector3 Position
     {
         get;
@@ -63,6 +63,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = Vector3.zero;
 
+    /// <summary>
+    /// Gets or sets the rotation of the toy relative to the <see cref="Transform"/> of the <see cref="ParentNetId"/>.
+    /// </summary>
     public Quaternion Rotation
     {
         get;
@@ -76,6 +79,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = Quaternion.identity;
 
+    /// <summary>
+    /// Gets or sets the scale of the toy relative to the <see cref="Transform"/> of the <see cref="ParentNetId"/>.
+    /// </summary>
     public Vector3 Scale
     {
         get;
@@ -89,6 +95,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = Vector3.one;
 
+    /// <summary>
+    /// Gets or sets the movement smoothing of the toy.
+    /// </summary>
     public byte MovementSmoothing
     {
         get;
@@ -102,6 +111,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = 60;
 
+    /// <summary>
+    /// Gets or sets if the toy is static.
+    /// </summary>
     public bool IsStatic
     {
         get;
@@ -115,6 +127,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = false;
 
+    /// <summary>
+    /// Gets or sets the <see cref="NetworkIdentity.netId"/> of the <see cref="Transform"/> that the toy will be parented to.
+    /// </summary>
     public uint ParentNetId
     {
         get;
@@ -127,6 +142,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     } = 0;
 
+    /// <summary>
+    /// Gets the <see cref="NetworkIdentity.netId"/> of the toy. It does not exist on the server.
+    /// </summary>
     public uint NetId
     {
         get
@@ -148,8 +166,16 @@ public abstract class ClientSideAdminToy : ICullable
     [PublicAPI]
     public ICullingProvider? CullingProvider { get; set; } = null;
 
+    /// <summary>
+    /// The prefabs asset id.
+    /// </summary>
     protected abstract uint AssetID { get; }
 
+    /// <summary>
+    /// Sets the parent of the toy. The <paramref name="parent"/> needs to have a <see cref="NetworkIdentity"/> component.
+    /// </summary>
+    /// <param name="parent"><see cref="Transform"/> which will be the parent</param>
+    /// <returns>Itself</returns>
     public ClientSideAdminToy SetParent(Transform parent)
     {
         if (parent.TryGetComponent(out NetworkIdentity networkIdentity))
@@ -164,6 +190,9 @@ public abstract class ClientSideAdminToy : ICullable
         return this;
     }
 
+    /// <summary>
+    /// Spawns the toy for all players.
+    /// </summary>
     public void SpawnForAll()
     {
         SpawnMessage spawnMessage = GetSpawnMessage();
@@ -175,6 +204,9 @@ public abstract class ClientSideAdminToy : ICullable
         }
     }
 
+    /// <summary>
+    /// Destroys the toy for all players.
+    /// </summary>
     public void DestroyForAll()
     {
         ObjectDestroyMessage msg = new()
@@ -189,6 +221,9 @@ public abstract class ClientSideAdminToy : ICullable
         CullingProvider?.Spawned.Clear();
     }
 
+    /// <summary>
+    /// Syncs the toy to all players.
+    /// </summary>
     public void Sync()
     {
         EntityStateMessage entityStateMessage = GetEntityStateMessage();
@@ -198,7 +233,10 @@ public abstract class ClientSideAdminToy : ICullable
         }
     }
 
-
+    /// <summary>
+    /// Gets the <see cref="SpawnMessage"/> that will be sent to the player.
+    /// </summary>
+    /// <returns>The <see cref="SpawnMessage"/></returns>
     public SpawnMessage GetSpawnMessage()
     {
         if (CachedSpawnMessage.HasValue)
@@ -233,6 +271,10 @@ public abstract class ClientSideAdminToy : ICullable
         return CachedSpawnMessage.Value;
     }
 
+    /// <summary>
+    /// Gets the <see cref="EntityStateMessage"/> that will be sent to the player.
+    /// </summary>
+    /// <returns>The <see cref="EntityStateMessage"/></returns>
     public EntityStateMessage GetEntityStateMessage()
     {
         if (CachedEntityStateMessage.HasValue)
