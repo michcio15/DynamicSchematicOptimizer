@@ -22,9 +22,16 @@ public class ClientSidedSchematic : ICullable
         Toys = toys;
         SchematicObject = schematicObject;
         OptimisationConfig = optimisationConfig;
+
+        foreach (ClientSideAdminToy toy in Toys)
+        {
+            toy.Schematic = this;
+        }
+
         SchematicCullingProvider = new SchematicCullingProvider(this);
     }
 
+    /// <inheritdoc />
     public void Spawn(Player player)
     {
         if (Spawned.Contains(player))
@@ -38,10 +45,7 @@ public class ClientSidedSchematic : ICullable
         Log.Debug($"Spawning {SchematicObject.name} for {player.Nickname}");
     }
 
-    /// <summary>
-    /// Destroys all of the <see cref="Toys"/> for the player, server-sided toys stay.
-    /// </summary>
-    /// <param name="player"><see cref="Player"/> for whom the toys will be destroyed</param>
+    /// <inheritdoc />
     public void Destroy(Player player)
     {
         for (int i = Toys.Count - 1; i >= 0; i--)

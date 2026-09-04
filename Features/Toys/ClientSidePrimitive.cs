@@ -17,9 +17,7 @@ public class ClientSidePrimitive : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 32UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(32UL);
         }
     }
 
@@ -30,9 +28,7 @@ public class ClientSidePrimitive : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 64UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(64UL);
         }
     }
 
@@ -43,9 +39,7 @@ public class ClientSidePrimitive : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 128UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(128UL);
         }
     }
 

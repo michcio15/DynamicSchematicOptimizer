@@ -17,9 +17,7 @@ public class ClientSideTextToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 32UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(32UL);
         }
     } = TextToy.DefaultDisplaySize;
 
@@ -30,9 +28,7 @@ public class ClientSideTextToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 64UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(64UL);
         }
     } = "Please write smth here <3";
 

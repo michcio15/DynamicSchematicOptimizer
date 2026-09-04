@@ -7,11 +7,15 @@ using JetBrains.Annotations;
 
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
+using LabApi.Features.Wrappers;
 
 using MEC;
 
 namespace DynamicSchematicOptimizer.Features;
 
+/// <summary>
+/// Handles the synchronization of <see cref="ClientSidedSchematic"/> and also culling.
+/// </summary>
 [PublicAPI]
 public static class SchematicSync
 {
@@ -44,10 +48,10 @@ public static class SchematicSync
     }
 
     /// <summary>
-    /// Tries to destroy the <see cref="ClientSidedSchematic"/> with the given <paramref name="netID"/> found in <see cref="ByNetID"/>.
+    /// Attempts to destroy the <see cref="ClientSidedSchematic"/> associated with the specified <paramref name="netID"/>.
     /// </summary>
-    /// <param name="netID">The <see cref="ClientSidedSchematic"/> netID</param>
-    /// <returns>Did it succeed</returns>
+    /// <param name="netID">The network ID of the schematic to destroy.</param>
+    /// <returns><see langword="true"/> if the schematic was successfully destroyed; otherwise, <see langword="false"/>.</returns>
     public static bool TryDestroySchematic(uint netID)
     {
         if (!ByNetID.TryGetValue(netID, out ClientSidedSchematic? schematic))
@@ -113,26 +117,23 @@ public static class SchematicSync
 
     private static void OnLeft(PlayerLeftEventArgs ev)
     {
-        foreach (ClientSidedSchematic clientSided in ByNetID.Values)
+        Player player = ev.Player;
+
+        foreach (ICullingProvider provider in CullingProviders)
         {
-            clientSided.Spawned.Remove(ev.Player);
+            provider.Ignored.Remove(player);
+            provider.Spawned.Remove(player);
         }
     }
-
-    /*private static void OnJoined(PlayerJoinedEventArgs ev)
-    {
-        foreach (ClientSidedSchematic schematic in ByNetID.Values)
-        {
-            schematic.Spawn(ev.Player);
-        }
-    }*/
 
     private static IEnumerator<float> SpawningCoroutine()
     {
         while (CullingProviders.Count > 0)
         {
-            foreach (ICullingProvider cullingProvider in CullingProviders)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int i = 0; i < CullingProviders.Count; i++)
             {
+                ICullingProvider cullingProvider = CullingProviders[i];
                 cullingProvider.Tick();
             }
 

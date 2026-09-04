@@ -18,7 +18,7 @@ public abstract class BaseCullingProvider : ICullingProvider
 
     public virtual void Tick()
     {
-        Vector3 pos = Cullable.GetWorldPosition();
+        Vector3 pos = GetWorldPosition();
         foreach (Player player in Player.ReadyList)
         {
             if (Ignored.Contains(player))

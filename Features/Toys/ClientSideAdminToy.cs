@@ -48,6 +48,11 @@ public abstract class ClientSideAdminToy : ICullable
     //private bool _parentDirty = false;
 
     /// <summary>
+    /// Gets the <see cref="ClientSidedSchematic"/> that owns this toy.
+    /// </summary>
+    public ClientSidedSchematic? Schematic { get; internal set; }
+
+    /// <summary>
     /// Gets or sets the position of the toy relative to the <see cref="Transform"/> of the <see cref="ParentNetId"/>.
     /// </summary>
     public Vector3 Position
@@ -57,9 +62,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            DirtyBits |= 1UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(1UL);
         }
     } = Vector3.zero;
 
@@ -73,9 +76,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            DirtyBits |= 2UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(2UL);
         }
     } = Quaternion.identity;
 
@@ -89,9 +90,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            DirtyBits |= 4UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(4UL);
         }
     } = Vector3.one;
 
@@ -105,9 +104,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            DirtyBits |= 8UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(8UL);
         }
     } = 60;
 
@@ -121,9 +118,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            DirtyBits |= 16UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(16UL);
         }
     } = false;
 
@@ -229,6 +224,7 @@ public abstract class ClientSideAdminToy : ICullable
         EntityStateMessage entityStateMessage = GetEntityStateMessage();
         foreach (Player p in Player.ReadyList)
         {
+            SendChangeParent(p.Connection);
             p.Connection.Send(entityStateMessage);
         }
     }
@@ -323,6 +319,17 @@ public abstract class ClientSideAdminToy : ICullable
 
     protected virtual void WriteSyncObjects(NetworkWriter writer)
     {
+    }
+
+    /// <summary>
+    /// Marks the given syncvar <paramref name="dirtyBits"/> as changed and invalidates the cached messages.
+    /// </summary>
+    /// <param name="dirtyBits">The syncvar dity bits to mark in <see cref="DirtyBits"/>.</param>
+    protected void MarkDirtyBits(ulong dirtyBits)
+    {
+        DirtyBits |= dirtyBits;
+        CachedEntityStateMessage = null;
+        CachedSpawnMessage = null;
     }
 
     protected virtual void WriteSyncVarsDelta(NetworkWriter writer)

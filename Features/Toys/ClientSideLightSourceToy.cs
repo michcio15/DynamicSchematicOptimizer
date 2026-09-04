@@ -15,9 +15,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 32UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(32UL);
         }
     }
 
@@ -28,9 +26,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 64UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(64UL);
         }
     }
 
@@ -41,9 +37,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 128UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(128UL);
         }
     }
 
@@ -54,9 +48,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 256UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(256UL);
         }
     }
 
@@ -67,9 +59,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 512UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(512UL);
         }
     }
 
@@ -80,9 +70,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 1024UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(1024UL);
         }
     }
 
@@ -94,9 +82,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 2048UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(2048UL);
         }
     }
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -108,9 +94,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 4096UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(4096UL);
         }
     }
 
@@ -121,9 +105,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         set
         {
             field = value;
-            DirtyBits |= 8192UL;
-            CachedEntityStateMessage = null;
-            CachedSpawnMessage = null;
+            MarkDirtyBits(8192UL);
         }
     }
 
