@@ -20,6 +20,8 @@ public abstract class ClientSideAdminToy : ICullable
 
     protected EntityStateMessage? CachedEntityStateMessage;
 
+    private bool _parentDirty = false;
+
     /// <inheritdoc />
     public void Spawn(Player player)
     {
@@ -44,8 +46,6 @@ public abstract class ClientSideAdminToy : ICullable
     {
         return Position;
     }
-
-    //private bool _parentDirty = false;
 
     /// <summary>
     /// Gets the <see cref="ClientSidedSchematic"/> that owns this toy.
@@ -132,7 +132,7 @@ public abstract class ClientSideAdminToy : ICullable
         set
         {
             field = value;
-            //_parentDirty = true;
+            _parentDirty = true;
             CachedSpawnMessage = null;
         }
     } = 0;
@@ -224,9 +224,15 @@ public abstract class ClientSideAdminToy : ICullable
         EntityStateMessage entityStateMessage = GetEntityStateMessage();
         foreach (Player p in Player.ReadyList)
         {
-            SendChangeParent(p.Connection);
+            if (_parentDirty)
+            {
+                SendChangeParent(p.Connection);
+            }
+
             p.Connection.Send(entityStateMessage);
         }
+
+        _parentDirty = false;
     }
 
     /// <summary>
@@ -286,6 +292,7 @@ public abstract class ClientSideAdminToy : ICullable
         writer.WriteByte(0);
         int contentPos = writer.Position;
 
+        WriteSyncObjectsDelta(writer);
         WriteSyncVarsDelta(writer);
 
         int endPos = writer.Position;
@@ -319,6 +326,16 @@ public abstract class ClientSideAdminToy : ICullable
 
     protected virtual void WriteSyncObjects(NetworkWriter writer)
     {
+    }
+
+    /// <summary>
+    /// Writes the sync object dirty mask that Mirror emits at the start of every non-initial payload
+    /// (see <see cref="NetworkBehaviour.SerializeObjectsDelta"/>). Admin toys own no sync objects, so it is always 0.
+    /// </summary>
+    /// <param name="writer">The writer to write to.</param>
+    protected virtual void WriteSyncObjectsDelta(NetworkWriter writer)
+    {
+        writer.WriteULong(0UL);
     }
 
     /// <summary>

@@ -1,6 +1,9 @@
 #if DEBUG
 
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+
+using AdminToys;
 
 using CommandSystem;
 
@@ -22,17 +25,22 @@ public class TestCommand : ICommand
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
     {
         Player player = Player.Get(sender)!;
-        ClientSideTextToy textToy = new()
+        ClientSidePrimitive toy = new()
         {
-            DisplaySize = new Vector2(50, 50),
-            TextFormat = "Hello World",
+            Color = Color.red,
+            Flags = PrimitiveFlags.Visible,
             IsStatic = false,
             Position = player.Position,
             Rotation = player.Rotation,
         };
-        textToy.SpawnForAll();
-        textToy.AddCulling(new SphereCullingProvider(textToy));
-
+        toy.AddCulling(new SphereCullingProvider(toy));
+        Timing.CallDelayed(1f, () =>
+        {
+            toy.Position = Vector3.zero;
+            toy.ParentNetId = player.NetworkId;
+            toy.Color = Color.green;
+            toy.Sync();
+        });
         response = string.Empty;
         return true;
     }

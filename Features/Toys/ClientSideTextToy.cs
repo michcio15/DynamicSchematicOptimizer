@@ -50,9 +50,6 @@ public class ClientSideTextToy : ClientSideAdminToy
 
     protected override void WriteSyncVarsDelta(NetworkWriter writer)
     {
-        // I would like to send my love to the jebana kurwa synclist.
-        writer.WriteULong(0);
-
         base.WriteSyncVarsDelta(writer);
 
         writer.WriteULong(DirtyBits);
