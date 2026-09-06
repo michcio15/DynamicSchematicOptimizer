@@ -16,6 +16,7 @@ public abstract class BaseCullingProvider : ICullingProvider
         Cullable = cullable;
     }
 
+    /// <inheritdoc />
     public virtual void Tick()
     {
         Vector3 pos = GetWorldPosition();
@@ -43,11 +44,15 @@ public abstract class BaseCullingProvider : ICullingProvider
         }
     }
 
+    /// <inheritdoc />
     public virtual void ShowDebugBounds()
     {
     }
 
+    /// <inheritdoc />
     public virtual HashSet<Player> Ignored { get; } = new();
+
+    /// <inheritdoc />
     public virtual HashSet<Player> Spawned { get; } = new();
 
     /// <summary>

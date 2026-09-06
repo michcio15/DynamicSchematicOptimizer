@@ -16,8 +16,7 @@ public interface ICullingProvider
     HashSet<Player> Ignored { get; }
 
     /// <summary>
-    /// Represents a collection of <see cref="Player"/> objects that have been marked as spawned
-    /// by the culling provider.
+    /// A collection of <see cref="Player"/>s that have spawned this culling provider.
     /// </summary>
     HashSet<Player> Spawned { get; }
 
