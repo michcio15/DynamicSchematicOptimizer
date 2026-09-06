@@ -44,7 +44,12 @@ public abstract class ClientSideAdminToy : ICullable
     /// <inheritdoc />
     public Vector3 GetWorldPosition()
     {
-        return Position;
+        if (ParentNetId == 0 || !NetworkServer.spawned.TryGetValue(ParentNetId, out NetworkIdentity networkIdentity))
+        {
+            return Position;
+        }
+
+        return networkIdentity.transform.position + Position;
     }
 
     /// <summary>

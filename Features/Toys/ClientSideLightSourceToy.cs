@@ -8,6 +8,9 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public class ClientSideLightSourceToy : ClientSideAdminToy
 {
+    /// <summary>
+    /// Gets or sets the intensity of the light.
+    /// </summary>
     public float LightIntensity
     {
         get;
@@ -19,6 +22,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the range of the light.
+    /// </summary>
     public float LightRange
     {
         get;
@@ -30,6 +36,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the <see cref="Color"/> of the light.
+    /// </summary>
     public Color LightColor
     {
         get;
@@ -41,6 +50,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the type of shadows.
+    /// </summary>
     public LightShadows ShadowType
     {
         get;
@@ -52,6 +64,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the strength of the shadows.
+    /// </summary>
     public float ShadowStrength
     {
         get;
@@ -63,6 +78,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the type of light.
+    /// </summary>
     public LightType LightType
     {
         get;
@@ -74,6 +92,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the shape of the light.
+    /// </summary>
 #pragma warning disable CS0618 // Type or member is obsolete
     public LightShape LightShape
     {
@@ -87,6 +108,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 
+    /// <summary>
+    /// Gets or sets the spot angle of the light.
+    /// </summary>
     public float SpotAngle
     {
         get;
@@ -98,6 +122,9 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
+    /// <summary>
+    /// Gets or sets the inner spot angle of the light.
+    /// </summary>
     public float InnerSpotAngle
     {
         get;
@@ -109,7 +136,7 @@ public class ClientSideLightSourceToy : ClientSideAdminToy
         }
     }
 
-    protected override uint AssetID { get; } = PrefabManager.LightSource.netIdentity.assetId;
+    protected override uint AssetID => PrefabManager.LightSource.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
     {

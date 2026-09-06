@@ -11,16 +11,6 @@ namespace DynamicSchematicOptimizer.Features.Culling;
 public interface ICullingProvider
 {
     /// <summary>
-    /// Called every <see cref="Config.CullingTickTimeInBetween"/> seconds to check if should be culled.
-    /// </summary>
-    void Tick();
-
-    /// <summary>
-    /// Shows the bounds of the culling provider.
-    /// </summary>
-    void ShowDebugBounds();
-
-    /// <summary>
     /// The <see cref="Player"/>s that should be ignored by the culling provider."/>
     /// </summary>
     HashSet<Player> Ignored { get; }
@@ -30,4 +20,14 @@ public interface ICullingProvider
     /// by the culling provider.
     /// </summary>
     HashSet<Player> Spawned { get; }
+
+    /// <summary>
+    /// Called every <see cref="Config.CullingTickTimeInBetween"/> seconds to check if should be culled.
+    /// </summary>
+    void Tick();
+
+    /// <summary>
+    /// Shows the bounds of the culling provider.
+    /// </summary>
+    void ShowDebugBounds();
 }

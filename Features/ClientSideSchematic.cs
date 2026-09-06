@@ -62,6 +62,9 @@ public class ClientSidedSchematic : ICullable
         return SchematicObject.Position;
     }
 
+    /// <summary>
+    /// <see cref="HashSet{T}"/> of <see cref="Player"/> that have spawned this schematic."/>
+    /// </summary>
     public HashSet<Player> Spawned { get; set; } = new();
 
     /// <summary>
@@ -69,13 +72,31 @@ public class ClientSidedSchematic : ICullable
     /// </summary>
     public HashSet<Player> Ignored { get; set; } = new();
 
+    /// <summary>
+    /// All <see cref="ClientSideAdminToy"/>s that are managed by this schematic.
+    /// </summary>
     public List<ClientSideAdminToy> Toys { get; }
 
+    /// <summary>
+    /// <see cref="SchematicOptimisationConfig"/> that is used for this schematic.
+    /// </summary>
     public SchematicOptimisationConfig OptimisationConfig { get; }
+
+    /// <summary>
+    /// Network ID of the schematic.
+    /// </summary>
     public uint NetID { get; set; }
+
     public SchematicCullingProvider SchematicCullingProvider { get; private set; }
+
+    /// <summary>
+    /// <see cref="SchematicObject"/> that is parent to all of the <see cref="Toys"/>.
+    /// </summary>
     public SchematicObject SchematicObject { get; }
 
+    /// <summary>
+    /// Spawns entire schematic for all players.
+    /// </summary>
     public void SpawnForAll()
     {
         foreach (Player player in Player.ReadyList)
@@ -113,7 +134,10 @@ public class ClientSidedSchematic : ICullable
         }
     }
 
-    public void Destroy()
+    /// <summary>
+    /// Destroys entire schematic for all players.
+    /// </summary>
+    public void DestroyForAll()
     {
         for (int i = Toys.Count - 1; i >= 0; i--)
         {

@@ -47,13 +47,13 @@ public abstract class BaseCullingProvider : ICullingProvider
     {
     }
 
+    public virtual HashSet<Player> Ignored { get; } = new();
+    public virtual HashSet<Player> Spawned { get; } = new();
+
     /// <summary>
     /// The <see cref="ICullable"/> that will be culled.
     /// </summary>
     public ICullable Cullable { get; }
-
-    public virtual HashSet<Player> Ignored { get; } = new();
-    public virtual HashSet<Player> Spawned { get; } = new();
 
     /// <summary>
     /// Should the <see cref="Cullable"/> be visible for the <paramref name="player"/> at <paramref name="position"/>.

@@ -10,6 +10,9 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public class ClientSideTextToy : ClientSideAdminToy
 {
+    /// <summary>
+    /// Gets or sets the size of the text.
+    /// </summary>
     public Vector2 DisplaySize
     {
         get;
@@ -21,6 +24,9 @@ public class ClientSideTextToy : ClientSideAdminToy
         }
     } = TextToy.DefaultDisplaySize;
 
+    /// <summary>
+    /// Gets or sets the text format.
+    /// </summary>
     public string TextFormat
     {
         get;
@@ -30,9 +36,9 @@ public class ClientSideTextToy : ClientSideAdminToy
             field = value;
             MarkDirtyBits(64UL);
         }
-    } = "Please write smth here <3";
+    } = "Please write smth here";
 
-    protected override uint AssetID { get; } = PrefabManager.Text.netIdentity.assetId;
+    protected override uint AssetID => PrefabManager.Text.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
     {

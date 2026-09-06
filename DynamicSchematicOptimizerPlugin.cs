@@ -61,7 +61,6 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         }
         else
         {
-
             Log.Debug("Auto updater is disabled");
         }
 #endif

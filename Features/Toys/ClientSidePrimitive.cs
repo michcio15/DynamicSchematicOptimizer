@@ -43,7 +43,7 @@ public class ClientSidePrimitive : ClientSideAdminToy
         }
     }
 
-    protected override uint AssetID { get; } = PrefabManager.PrimitiveObject.netIdentity.assetId;
+    protected override uint AssetID => PrefabManager.PrimitiveObject.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
     {

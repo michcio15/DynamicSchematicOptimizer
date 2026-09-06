@@ -18,6 +18,10 @@ that the schematics won't be shown 24/7.
 
 You will need to animate **ONLY EMPTY OBJECTS** since they stay on the server side.
 
+# Requirements
+- Harmony 2.4.2
+- ProjectMER
+
 # Available commands
 
 - `optimizer create [schematic name]` — Creates a config file for the schematic.

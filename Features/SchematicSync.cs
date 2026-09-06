@@ -59,7 +59,7 @@ public static class SchematicSync
             return false;
         }
 
-        schematic.Destroy();
+        schematic.DestroyForAll();
 
         CullingProviders.Remove(schematic.SchematicCullingProvider);
         foreach (ClientSideAdminToy toy in schematic.Toys)
