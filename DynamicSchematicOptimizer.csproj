@@ -15,7 +15,7 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>none</DebugType>
+        <DebugType>portable</DebugType>
         <DocumentationFile>bin\Release\DynamicSchematicOptimizer.xml</DocumentationFile>
     </PropertyGroup>
 

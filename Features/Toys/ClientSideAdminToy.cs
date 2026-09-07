@@ -241,6 +241,15 @@ public abstract class ClientSideAdminToy : ICullable
     }
 
     /// <summary>
+    /// Clears all of the dirty bits.
+    /// </summary>
+    public void ClearDirtyBits()
+    {
+        DirtyBits = 0Ul;
+        _parentDirty = false;
+    }
+
+    /// <summary>
     /// Gets the <see cref="SpawnMessage"/> that will be sent to the player.
     /// </summary>
     /// <returns>The <see cref="SpawnMessage"/></returns>

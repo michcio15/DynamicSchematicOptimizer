@@ -32,6 +32,7 @@ internal static class ClientSideSchematicBuilder
             toy.Rotation = Quaternion.Euler(block.Rotation);
             toy.MovementSmoothing = optimisationConfig.MovementSmoothing;
             toy.ParentNetId = ResolveParentNetId(plannedBlock, schematicObject, netIdByObjectId, rootNetId);
+            toy.ClearDirtyBits();
 
             netIdByObjectId[block.ObjectId] = toy.NetId;
             toys.Add(toy);

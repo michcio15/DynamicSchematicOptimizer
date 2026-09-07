@@ -23,10 +23,9 @@ public class TestCommand : ICommand
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
     {
         Player player = Player.Get(sender)!;
-        ClientSidePrimitive toy = new()
+        ClientSideTextToy toy = new()
         {
-            Color = Color.red,
-            Flags = PrimitiveFlags.Visible,
+            TextFormat = "cooo",
             IsStatic = false,
             Position = player.Position,
             Rotation = player.Rotation,
@@ -34,9 +33,9 @@ public class TestCommand : ICommand
         toy.AddCulling(new SphereCullingProvider(toy));
         Timing.CallDelayed(1f, () =>
         {
-            toy.Position = Vector3.zero;
+            toy.Position = Vector3.forward;
             toy.ParentNetId = player.NetworkId;
-            toy.Color = Color.green;
+            toy.TextFormat = "oook";
             toy.Sync();
         });
         response = string.Empty;
