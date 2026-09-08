@@ -23,6 +23,9 @@ public class OptimizerParentCommand : ParentCommand
         RegisterCommand(new CreateCommand());
         RegisterCommand(new InfoCommand());
         RegisterCommand(new CullingCommand());
+#if DEBUG
+        RegisterCommand(new TestCommand());
+#endif
     }
 
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)

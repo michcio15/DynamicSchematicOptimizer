@@ -1,3 +1,5 @@
+using AdminToys;
+
 using Mirror;
 
 using ProjectMER.Features;
@@ -8,14 +10,40 @@ namespace DynamicSchematicOptimizer.Features.Toys;
 
 public class ClientSideTextToy : ClientSideAdminToy
 {
-    public Vector2 Size { get; set; }
-    public string TextFormat { get; set; } = string.Empty;
-    protected override uint AssetID { get; } = PrefabManager.Text.netIdentity.assetId;
+    /// <summary>
+    /// Gets or sets the size of the text.
+    /// </summary>
+    public Vector2 DisplaySize
+    {
+        get;
+
+        set
+        {
+            field = value;
+            MarkDirtyBits(32UL);
+        }
+    } = TextToy.DefaultDisplaySize;
+
+    /// <summary>
+    /// Gets or sets the text format.
+    /// </summary>
+    public string TextFormat
+    {
+        get;
+
+        set
+        {
+            field = value;
+            MarkDirtyBits(64UL);
+        }
+    } = "Please write smth here";
+
+    protected override uint AssetID => PrefabManager.Text.netIdentity.assetId;
 
     protected override void WriteSyncVars(NetworkWriter writer)
     {
         base.WriteSyncVars(writer);
-        writer.WriteVector2(Size);
+        writer.WriteVector2(DisplaySize);
         writer.WriteString(TextFormat);
     }
 
@@ -24,5 +52,22 @@ public class ClientSideTextToy : ClientSideAdminToy
         base.WriteSyncObjects(writer);
         writer.WriteUInt(0);
         writer.WriteUInt(0);
+    }
+
+    protected override void WriteSyncVarsDelta(NetworkWriter writer)
+    {
+        base.WriteSyncVarsDelta(writer);
+
+        writer.WriteULong(DirtyBits);
+
+        if ((DirtyBits & 32UL) != 0)
+        {
+            writer.WriteVector2(DisplaySize);
+        }
+
+        if ((DirtyBits & 64UL) != 0)
+        {
+            writer.WriteString(TextFormat);
+        }
     }
 }

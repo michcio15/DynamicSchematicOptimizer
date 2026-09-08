@@ -4,8 +4,8 @@ This is a ProjectMER optimizer for schematics that are meant to be animated / mo
 
 ## Why shouldn't I just use MERO?
 
-Because it's not a replacement for MERO, more like an extension.
-DSO also has a MERO compatibility that can be enabled in the Config.yml file. Enabling it will make the plugin optimize schematics that are excluded from MERO.
+Because it's not a replacement for MERO, more like an extension. DSO also has a MERO compatibility that can be enabled
+in the Config.yml file. Enabling it will make the plugin optimize schematics that are excluded from MERO.
 
 # How to use it?
 
@@ -17,6 +17,10 @@ that the schematics won't be shown 24/7.
 ## What if I want to animate an optimized schematic?
 
 You will need to animate **ONLY EMPTY OBJECTS** since they stay on the server side.
+
+# Requirements
+- Harmony 2.4.2
+- ProjectMER
 
 # Available commands
 

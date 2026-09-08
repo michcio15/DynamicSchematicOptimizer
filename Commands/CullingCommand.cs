@@ -2,7 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 
 using CommandSystem;
 
+using DrawableLine;
+
 using DynamicSchematicOptimizer.Features;
+using DynamicSchematicOptimizer.Features.Culling;
 
 using LabApi.Features.Wrappers;
 
@@ -47,7 +50,23 @@ public class CullingCommand : BaseOptimizerCommand, IUsageProvider
             }
         }
 
-        response = $"Visible schematics: {visibleSchematics} ({visibleToys}) / Hidden: {hiddenSchematics} ({hiddenToys})";
+        int visibleCullables = 0;
+        int hiddenCullables = 0;
+
+        foreach (ICullingProvider cullingProvider in SchematicSync.CullingProviders)
+        {
+            if (cullingProvider.Spawned.Contains(player))
+            {
+                visibleCullables++;
+            }
+            else
+            {
+                hiddenCullables++;
+            }
+        }
+
+        response = $"Visible schematics: {visibleSchematics} ({visibleToys}) / Hidden: {hiddenSchematics} ({hiddenToys})\n" +
+                   $"Overall cullables {visibleCullables} / {hiddenCullables}";
         return true;
     }
 
@@ -79,10 +98,15 @@ public class CullingCommand : BaseOptimizerCommand, IUsageProvider
             return false;
         }
 
-        foreach (ClientSidedSchematic clientSidedSchematic in SchematicSync.ByNetID.Values)
+        bool isDebug = DrawableLines.IsDebugModeEnabled;
+        DrawableLines.IsDebugModeEnabled = true;
+
+        foreach (ICullingProvider cullingProvider in SchematicSync.CullingProviders)
         {
-            clientSidedSchematic.BoundsCulling.ShowDebugBounds();
+            cullingProvider.ShowDebugBounds();
         }
+
+        DrawableLines.IsDebugModeEnabled = isDebug;
 
         response = "Culling bounds shown";
         return true;

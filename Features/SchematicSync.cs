@@ -1,27 +1,57 @@
 using System.Diagnostics.CodeAnalysis;
 
+using DynamicSchematicOptimizer.Features.Culling;
+using DynamicSchematicOptimizer.Features.Toys;
+
+using JetBrains.Annotations;
+
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
+using LabApi.Features.Wrappers;
 
 using MEC;
 
 namespace DynamicSchematicOptimizer.Features;
 
+/// <summary>
+/// Handles the synchronization of <see cref="ClientSidedSchematic"/> and also culling.
+/// </summary>
+[PublicAPI]
 public static class SchematicSync
 {
+    /// <summary>
+    /// If you have a custom <see cref="ICullingProvider"/> per toy you should add it here.
+    /// </summary>
+    [PublicAPI]
+    public static readonly List<ICullingProvider> CullingProviders = new();
+
     internal static readonly Dictionary<uint, ClientSidedSchematic> ByNetID = new();
 
     private static float _timeBetweenTicks = 0;
 
     private static CoroutineHandle? _coroutineHandle = null;
 
+    /// <summary>
+    /// All <see cref="ClientSidedSchematic"/>s that are currently spawned.
+    /// </summary>
     public static IReadOnlyCollection<ClientSidedSchematic> Schematics => ByNetID.Values;
 
+    /// <summary>
+    /// Attempts to retrieve the <see cref="ClientSidedSchematic"/> associated with the specified <paramref name="netID"/>.
+    /// </summary>
+    /// <param name="netID">The network ID of the schematic to retrieve.</param>
+    /// <param name="schematic">The retrieved <see cref="ClientSidedSchematic"/> if successfully found; otherwise, null.</param>
+    /// <returns><see langword="true"/> if the schematic was successfully retrieved; otherwise, <see langword="false"/>.</returns>
     public static bool TryGetSchematic(uint netID, [NotNullWhen(true)] out ClientSidedSchematic? schematic)
     {
         return ByNetID.TryGetValue(netID, out schematic);
     }
 
+    /// <summary>
+    /// Attempts to destroy the <see cref="ClientSidedSchematic"/> associated with the specified <paramref name="netID"/>.
+    /// </summary>
+    /// <param name="netID">The network ID of the schematic to destroy.</param>
+    /// <returns><see langword="true"/> if the schematic was successfully destroyed; otherwise, <see langword="false"/>.</returns>
     public static bool TryDestroySchematic(uint netID)
     {
         if (!ByNetID.TryGetValue(netID, out ClientSidedSchematic? schematic))
@@ -29,7 +59,16 @@ public static class SchematicSync
             return false;
         }
 
-        schematic.Destroy();
+        schematic.DestroyForAll();
+
+        CullingProviders.Remove(schematic.SchematicCullingProvider);
+        foreach (ClientSideAdminToy toy in schematic.Toys)
+        {
+            if (toy.CullingProvider != null)
+            {
+                CullingProviders.Remove(toy.CullingProvider);
+            }
+        }
 
         ByNetID.Remove(netID);
         if (ByNetID.Count == 0 && _coroutineHandle != null)
@@ -43,9 +82,14 @@ public static class SchematicSync
         return true;
     }
 
+    /// <summary>
+    /// Adds <paramref name="schematic"/> to the <see cref="ByNetID"/> and <see cref="CullingProviders"/>.
+    /// </summary>
+    /// <param name="schematic"><see cref="ClientSidedSchematic"/> that will be added</param>
     public static void AddSchematic(ClientSidedSchematic schematic)
     {
         ByNetID.Add(schematic.NetID, schematic);
+        CullingProviders.Add(schematic.SchematicCullingProvider);
         _coroutineHandle ??= Timing.RunCoroutine(SpawningCoroutine());
     }
 
@@ -59,6 +103,7 @@ public static class SchematicSync
     internal static void Unregister()
     {
         ByNetID.Clear();
+        CullingProviders.Clear();
 
         if (_coroutineHandle != null)
         {
@@ -72,27 +117,24 @@ public static class SchematicSync
 
     private static void OnLeft(PlayerLeftEventArgs ev)
     {
-        foreach (ClientSidedSchematic clientSided in ByNetID.Values)
+        Player player = ev.Player;
+
+        foreach (ICullingProvider provider in CullingProviders)
         {
-            clientSided.Spawned.Remove(ev.Player);
+            provider.Ignored.Remove(player);
+            provider.Spawned.Remove(player);
         }
     }
 
-    /*private static void OnJoined(PlayerJoinedEventArgs ev)
-    {
-        foreach (ClientSidedSchematic schematic in ByNetID.Values)
-        {
-            schematic.Spawn(ev.Player);
-        }
-    }*/
-
     private static IEnumerator<float> SpawningCoroutine()
     {
-        while (ByNetID.Count > 0)
+        while (CullingProviders.Count > 0)
         {
-            foreach (ClientSidedSchematic schematic in ByNetID.Values)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int i = 0; i < CullingProviders.Count; i++)
             {
-                schematic.BoundsCulling.Tick();
+                ICullingProvider cullingProvider = CullingProviders[i];
+                cullingProvider.Tick();
             }
 
             yield return Timing.WaitForSeconds(_timeBetweenTicks);

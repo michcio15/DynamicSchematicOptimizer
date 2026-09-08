@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -47,8 +48,7 @@ public static class SpawnOrUpdateObjectSchematicPatch
         //matcher.Advance(-1);
         matcher.InsertAndAdvance(new CodeInstruction(OpCodes.Brfalse, label), new CodeInstruction(OpCodes.Ldloc_0),
                 new CodeInstruction(OpCodes.Callvirt, getGameObject), new CodeInstruction(OpCodes.Ret))
-            .ThrowIfInvalid("ododowo");
-
+            .ThrowIfInvalid($"Didnt patch SpawnOrUpdateObjectSchematic {new StackTrace()}");
 
         return matcher.InstructionEnumeration();
     }

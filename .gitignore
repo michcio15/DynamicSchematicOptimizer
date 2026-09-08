@@ -58,6 +58,8 @@ MigrationBackup/
 TestResult.xml
 nunit-*.xml
 
+CLAUDE.md
+
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 

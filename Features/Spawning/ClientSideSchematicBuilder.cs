@@ -32,6 +32,7 @@ internal static class ClientSideSchematicBuilder
             toy.Rotation = Quaternion.Euler(block.Rotation);
             toy.MovementSmoothing = optimisationConfig.MovementSmoothing;
             toy.ParentNetId = ResolveParentNetId(plannedBlock, schematicObject, netIdByObjectId, rootNetId);
+            toy.ClearDirtyBits();
 
             netIdByObjectId[block.ObjectId] = toy.NetId;
             toys.Add(toy);
@@ -110,7 +111,7 @@ internal static class ClientSideSchematicBuilder
         Dictionary<string, object> properties = block.Properties;
 
         text.TextFormat = Convert.ToString(properties["Text"]);
-        text.Size = properties["DisplaySize"].ToVector2() * 20f;
+        text.DisplaySize = properties["DisplaySize"].ToVector2() * 20f;
         text.IsStatic = optimisationConfigTextToy.IsStatic;
         return text;
     }
