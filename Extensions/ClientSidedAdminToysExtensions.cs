@@ -15,9 +15,10 @@ public static class ClientSidedAdminToysExtensions
         /// Adds a culling provider to the toy.
         /// </summary>
         /// <param name="culling">The instance of the <see cref="ICullingProvider"/></param>
+        /// <param name="forceSpawn">Should spawn to every player. If <see langword="false"/> Object will be spawned with <see cref="SchematicSync._timeBetweenTicks"/>s of latency</param>
         /// <typeparam name="T"><see cref="ICullingProvider"/> which will be added</typeparam>
         /// <returns>The <see cref="ICullingProvider"/></returns>
-        public T AddCulling<T>(T culling) where T : ICullingProvider
+        public T AddCulling<T>(T culling, bool forceSpawn = false) where T : ICullingProvider
         {
             if (clientSideAdminToy.CullingProvider != null)
             {
@@ -25,7 +26,15 @@ public static class ClientSidedAdminToysExtensions
             }
 
             clientSideAdminToy.CullingProvider = culling;
+
+
             SchematicSync.CullingProviders.Add(culling);
+
+            if (forceSpawn)
+            {
+                clientSideAdminToy.SpawnForAll();
+            }
+
             return culling;
         }
 

@@ -50,7 +50,23 @@ public class CullingCommand : BaseOptimizerCommand, IUsageProvider
             }
         }
 
-        response = $"Visible schematics: {visibleSchematics} ({visibleToys}) / Hidden: {hiddenSchematics} ({hiddenToys})";
+        int visibleCullables = 0;
+        int hiddenCullables = 0;
+
+        foreach (ICullingProvider cullingProvider in SchematicSync.CullingProviders)
+        {
+            if (cullingProvider.Spawned.Contains(player))
+            {
+                visibleCullables++;
+            }
+            else
+            {
+                hiddenCullables++;
+            }
+        }
+
+        response = $"Visible schematics: {visibleSchematics} ({visibleToys}) / Hidden: {hiddenSchematics} ({hiddenToys})\n" +
+                   $"Overall cullables {visibleCullables} / {hiddenCullables}";
         return true;
     }
 
