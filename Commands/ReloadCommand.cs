@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 
 using CommandSystem;
 
+using DynamicSchematicOptimizer.Patches;
+
 namespace DynamicSchematicOptimizer.Commands;
 
 public class ReloadCommand : BaseOptimizerCommand
@@ -19,6 +21,7 @@ public class ReloadCommand : BaseOptimizerCommand
         }
 
         ConfigLoader.ReloadAll();
+        SchematicDataCachePatch.Clear();
         response = "Successfully reloaded the configs";
         return true;
     }

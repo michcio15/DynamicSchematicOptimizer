@@ -5,6 +5,7 @@ using CommandSystem;
 
 using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Toys;
+using DynamicSchematicOptimizer.Patches;
 
 using Mirror;
 
@@ -91,7 +92,8 @@ public class InfoCommand : BaseOptimizerCommand, IUsageProvider
             }
 
             response = $"Spawned schematics: {SchematicSync.ByNetID.Values.Count}\n" +
-                       $"Client sided: {clientSidedToys} | Server sided: {serverSidedToys}\n";
+                       $"Client sided: {clientSidedToys} | Server sided: {serverSidedToys}\n" +
+                       $"Cached schematics: {SchematicDataCachePatch.Cache.Count}";
             return true;
         }
 

@@ -3,6 +3,7 @@ using DynamicSchematicOptimizer.Events;
 using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Spawning;
 using DynamicSchematicOptimizer.Features.Toys;
+using DynamicSchematicOptimizer.Patches;
 
 using HarmonyLib;
 
@@ -35,10 +36,10 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public static new Config Config { get; private set; } = null!;
     public static DynamicSchematicOptimizerPlugin Instance { get; private set; } = null!;
 
-    public override string Name { get; } = "Dynamic Schematic Optimizer";
-    public override string Description { get; } = "Plugin for ProjectMER that optimizes schematics";
-    public override string Author { get; } = "michcio";
-    public override Version Version { get; } = new(1, 4, 0);
+    public override string Name => "Dynamic Schematic Optimizer";
+    public override string Description => "Plugin for ProjectMER that optimizes schematics";
+    public override string Author => "michcio";
+    public override Version Version { get; } = new(1, 4, 1);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
     public override LoadPriority Priority { get; } = LoadPriority.Low;
 
@@ -48,7 +49,13 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         Config = base.Config;
 
         _harmony = new Harmony(nameof(DynamicSchematicOptimizerPlugin));
-        _harmony.PatchAll();
+        _harmony.CreateClassProcessor(typeof(SpawnOrUpdateObjectSchematicPatch)).Patch();
+
+        if (Config.SchematicCaching)
+        {
+            _harmony.CreateClassProcessor(typeof(SchematicDataCachePatch)).Patch();
+            Log.Debug("Schematic caching enabled");
+        }
 
 
         ConfigLoader.Init();

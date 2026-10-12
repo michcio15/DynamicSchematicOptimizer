@@ -18,6 +18,9 @@ public class Config
 
     public float CullingTickTimeInBetween { get; set; } = 1;
 
+    [Description("If true then DSO will cache the schematic data so for every spawn the file does not have to be read again.")]
+    public bool SchematicCaching { get; set; } = true;
+
     [Description(
         "If true, DSO checks GitHub for a newer release on startup and downloads the plugin dll. The update is applied on the next server restart")]
     public bool EnableAutoUpdater { get; set; } = false;
