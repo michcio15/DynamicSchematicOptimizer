@@ -39,7 +39,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public override string Name => "Dynamic Schematic Optimizer";
     public override string Description => "Plugin for ProjectMER that optimizes schematics";
     public override string Author => "michcio";
-    public override Version Version { get; } = new(1, 4, 1);
+    public override Version Version { get; } = new(1, 4, 2);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
     public override LoadPriority Priority { get; } = LoadPriority.Low;
 
