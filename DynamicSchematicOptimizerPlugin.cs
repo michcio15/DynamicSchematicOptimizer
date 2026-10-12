@@ -89,6 +89,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         MEROCompatibility = null!;
 
         ConfigLoader.Disable();
+        SchematicDataCachePatch.Clear();
         SchematicSync.Unregister();
 
         SchematicEventHandler.SchematicSpawning -= OnSchematicSpawning;
