@@ -19,15 +19,17 @@ public static class SchematicDataCachePatch
     [HarmonyPrefix]
     private static bool Prefix(string schematicName, ref SchematicObjectDataList __result, out bool __state)
     {
-        __state = Cache.TryGetValue(schematicName, out __result);
-        return !__state;
+        __state = DynamicSchematicOptimizerPlugin.Instance.ShouldBeOptimised(schematicName, out SchematicOptimisationConfig? config) &&
+                  config.ShouldBeCached;
+
+        return !__state || !Cache.TryGetValue(schematicName, out __result);
     }
 
     [UsedImplicitly]
     [HarmonyPostfix]
     private static void Postfix(string schematicName, SchematicObjectDataList __result, bool __state)
     {
-        if (!__state && __result != null)
+        if (__state && __result != null)
         {
             Cache[schematicName] = __result;
         }

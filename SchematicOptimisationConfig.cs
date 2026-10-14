@@ -3,6 +3,7 @@ namespace DynamicSchematicOptimizer;
 public class SchematicOptimisationConfig
 {
     public bool Enabled { get; set; } = true;
+    public bool ShouldBeCached { get; set; } = true;
     public byte CullingDistance { get; set; } = 33;
     public byte MovementSmoothing { get; set; } = 60;
 

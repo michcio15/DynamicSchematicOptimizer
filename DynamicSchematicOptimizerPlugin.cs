@@ -1,4 +1,6 @@
-﻿using DynamicSchematicOptimizer.Compatibility;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using DynamicSchematicOptimizer.Compatibility;
 using DynamicSchematicOptimizer.Events;
 using DynamicSchematicOptimizer.Features;
 using DynamicSchematicOptimizer.Features.Spawning;
@@ -39,7 +41,7 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
     public override string Name => "Dynamic Schematic Optimizer";
     public override string Description => "Plugin for ProjectMER that optimizes schematics";
     public override string Author => "michcio";
-    public override Version Version { get; } = new(1, 4, 2);
+    public override Version Version { get; } = new(1, 4, 3);
     public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
     public override LoadPriority Priority { get; } = LoadPriority.Low;
 
@@ -119,17 +121,9 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
 
     private void OnSchematicSpawning(SchematicSpawningExtendedEventArgs ev)
     {
-        if (!ConfigLoader.TryGetConfig(ev.Schematic.SchematicName, out SchematicOptimisationConfig? optimisationConfig) || !optimisationConfig.Enabled)
+        if (!ShouldBeOptimised(ev.Schematic.SchematicName, out SchematicOptimisationConfig? optimisationConfig))
         {
-            if (MEROCompatibility == null || !MEROCompatibility.ShouldSchematicBeOptimized(ev.Schematic))
-            {
-                Log.Debug($"{ev.Schematic.SchematicName} is not optimized");
-                return;
-            }
-
-            Log.Debug($"{ev.Schematic.SchematicName} is optimized because of MERO compatibility");
-
-            optimisationConfig = Config.DefaultConfig;
+            return;
         }
 
         SchematicSpawnPlan plan =
@@ -161,6 +155,24 @@ public class DynamicSchematicOptimizerPlugin : Plugin<Config>
         ClientSidedSchematic clientSidedSchematic = new(netId, clientToys, schematicObject, optimisationConfig);
         clientSidedSchematic.SpawnForAll();
         SchematicSync.AddSchematic(clientSidedSchematic);
+    }
+
+    public bool ShouldBeOptimised(string schematicName, [NotNullWhen(true)] out SchematicOptimisationConfig? optimisationConfig)
+    {
+        if (!ConfigLoader.TryGetConfig(schematicName, out optimisationConfig) || !optimisationConfig.Enabled)
+        {
+            if (MEROCompatibility == null || !MEROCompatibility.ShouldSchematicBeOptimized(schematicName))
+            {
+                Log.Debug($"{schematicName} is not optimized");
+                return false;
+            }
+
+            Log.Debug($"{schematicName} is optimized because of MERO compatibility");
+
+            optimisationConfig = Config.DefaultConfig;
+        }
+
+        return true;
     }
 
     private void OnSchematicDestroyed(SchematicDestroyedEventArgs ev)

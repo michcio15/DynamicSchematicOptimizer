@@ -18,7 +18,7 @@ public class Config
 
     public float CullingTickTimeInBetween { get; set; } = 1;
 
-    [Description("If true then DSO will cache the schematic data so for every spawn the file does not have to be read again.")]
+    [Description("If true then DSO will cache the schematic data for optimized schematic if enabled in their config so for every spawn the file does not have to be read again.")]
     public bool SchematicCaching { get; set; } = true;
 
     [Description(
