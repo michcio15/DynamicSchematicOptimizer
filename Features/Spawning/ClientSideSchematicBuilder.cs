@@ -27,6 +27,7 @@ internal static class ClientSideSchematicBuilder
             SchematicBlockData block = plannedBlock.Block;
 
             ClientSideAdminToy toy = CreateToy(block, optimisationConfig);
+            toy.Name = block.Name;
             toy.Position = block.Position;
             toy.Scale = block.Scale;
             toy.Rotation = Quaternion.Euler(block.Rotation);

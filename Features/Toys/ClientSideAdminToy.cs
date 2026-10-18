@@ -58,6 +58,11 @@ public abstract class ClientSideAdminToy : ICullable
     public ClientSidedSchematic? Schematic { get; internal set; }
 
     /// <summary>
+    /// Gets or sets the name of the toy.
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the position of the toy relative to the <see cref="Transform"/> of the <see cref="ParentNetId"/>.
     /// </summary>
     public Vector3 Position

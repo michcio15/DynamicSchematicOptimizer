@@ -3,13 +3,13 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
-using YamlDotNet.Serialization;
-
 namespace DynamicSchematicOptimizer;
 
 internal static class AutoUpdater
 {
-    private const string LatestReleaseUrl = "https://api.github.com/repos/michcio15/DynamicSchematicOptimizer/releases/latest";
+    private const string ReleasesUrl = "https://github.com/michcio15/DynamicSchematicOptimizer/releases";
+
+    private const string AssetName = "DynamicSchematicOptimizer.dll";
 
     private static readonly Regex VersionPattern = new(@"\d+(?:\.\d+){1,3}", RegexOptions.Compiled);
 
@@ -22,15 +22,13 @@ internal static class AutoUpdater
             using HttpClient client = new();
             client.Timeout = TimeSpan.FromSeconds(15);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("DynamicSchematicOptimizer-AutoUpdater");
-            client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
 
-            string json = await client.GetStringAsync(LatestReleaseUrl).ConfigureAwait(false);
+            // releases/latest redirects to releases/tag/<tag>, so the final request uri carries the tag
+            using HttpResponseMessage latest = await client.GetAsync($"{ReleasesUrl}/latest", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            latest.EnsureSuccessStatusCode();
 
-            IDeserializer deserializer = new DeserializerBuilder().Build();
-            Dictionary<object, object> release = deserializer.Deserialize<Dictionary<object, object>>(json);
-
-            if (!release.TryGetValue("tag_name", out object? tagObj) || tagObj is not string tagName ||
-                !TryParseVersion(tagName, out Version? latestVersion))
+            string tagName = latest.RequestMessage.RequestUri.Segments.Last();
+            if (!TryParseVersion(tagName, out Version? latestVersion))
             {
                 Log.Warn("Auto updater couldn't read the latest release version from GitHub");
                 return;
@@ -39,20 +37,7 @@ internal static class AutoUpdater
             Version currentVersion = DynamicSchematicOptimizerPlugin.Instance.Version;
             if (latestVersion <= currentVersion)
             {
-                Log.Debug($"DSO is up to date ({currentVersion})");
-                return;
-            }
-
-            if (!release.TryGetValue("assets", out object? assetsObj) || assetsObj is not List<object> assets)
-            {
-                Log.Warn($"Auto updater found version {latestVersion} but the release has no assets");
-                return;
-            }
-
-            string? downloadUrl = FindDllAssetUrl(assets);
-            if (downloadUrl == null)
-            {
-                Log.Warn($"Auto updater found version {latestVersion} but no .dll asset was attached to the release");
+                Log.Info($"DSO is up to date ({currentVersion})");
                 return;
             }
 
@@ -63,7 +48,15 @@ internal static class AutoUpdater
                 return;
             }
 
-            byte[] bytes = await client.GetByteArrayAsync(downloadUrl).ConfigureAwait(false);
+            using HttpResponseMessage asset = await client.GetAsync($"{ReleasesUrl}/download/{tagName}/{AssetName}").ConfigureAwait(false);
+            if (asset.StatusCode == HttpStatusCode.NotFound)
+            {
+                Log.Warn($"Auto updater found version {latestVersion} but no {AssetName} was attached to the release");
+                return;
+            }
+
+            asset.EnsureSuccessStatusCode();
+            byte[] bytes = await asset.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
             string tempPath = pluginPath + ".update";
             await File.WriteAllBytesAsync(tempPath, bytes);
@@ -76,26 +69,6 @@ internal static class AutoUpdater
         {
             Log.Error($"Auto updater failed: {e}");
         }
-    }
-
-    private static string? FindDllAssetUrl(List<object> assets)
-    {
-        foreach (object assetObj in assets)
-        {
-            if (assetObj is not Dictionary<object, object> asset)
-            {
-                continue;
-            }
-
-            if (asset.TryGetValue("name", out object? nameObj) && nameObj is string name &&
-                name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) &&
-                asset.TryGetValue("browser_download_url", out object? urlObj) && urlObj is string url)
-            {
-                return url;
-            }
-        }
-
-        return null;
     }
 
     private static bool TryParseVersion(string tag, [NotNullWhen(true)] out Version? version)
